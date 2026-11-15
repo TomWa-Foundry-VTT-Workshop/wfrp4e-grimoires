@@ -1,0 +1,102 @@
+[
+  {
+    "id": "cover_corner",
+    "file": "cover_corner.svg",
+    "subject": "Metal corner fitting of a book cover, top-left: riveted plate with an engraved leaf; rotate for the other corners"
+  },
+  {
+    "id": "cover_clasp",
+    "file": "cover_clasp.svg",
+    "subject": "Book clasp, vertical: hinge at the top, leather strap, metal hook plate with a catch slot"
+  },
+  {
+    "id": "cover_tooling",
+    "file": "cover_tooling.svg",
+    "subject": "Tileable blind-tooled leather pattern: interlaced double rules and small lozenges (low contrast)"
+  },
+  {
+    "id": "spine_band",
+    "file": "spine_band.svg",
+    "subject": "Raised spine band (horizontal cord), repeat vertically along the gutter"
+  },
+  {
+    "id": "page_frame_corner",
+    "file": "page_frame_corner.svg",
+    "subject": "Double-rule page frame corner with a small flourish, top-left; rules run off the right and bottom edges"
+  },
+  {
+    "id": "deckle_edge",
+    "file": "deckle_edge.svg",
+    "subject": "Rough deckled paper edge, tileable horizontally, solid at the bottom, ragged at the top"
+  },
+  {
+    "id": "ribbon",
+    "file": "ribbon.svg",
+    "subject": "Hanging silk bookmark ribbon with a swallow-tail end and a fold"
+  },
+  {
+    "id": "dropcap_frame",
+    "file": "dropcap_frame.svg",
+    "subject": "Square frame for an illuminated initial with corner vines, empty centre for the letter"
+  },
+  {
+    "id": "rubric_divider",
+    "file": "rubric_divider.svg",
+    "subject": "Horizontal divider: thin rule with a central knot and leaf ends"
+  },
+  {
+    "id": "tailpiece",
+    "file": "tailpiece.svg",
+    "subject": "End-of-chapter vignette: symmetrical leaf scrolls around a small urn"
+  },
+  {
+    "id": "cn_medallion",
+    "file": "cn_medallion.svg",
+    "subject": "Round medallion with a beaded rim and a plain centre for the CN number"
+  },
+  {
+    "id": "wax_seal",
+    "file": "wax_seal.svg",
+    "subject": "Blank wax seal with an irregular edge and an inner ring for a sigil"
+  },
+  {
+    "id": "lock_plate",
+    "file": "lock_plate.svg",
+    "subject": "Ornate lock plate with a large keyhole and four rivets"
+  },
+  {
+    "id": "chain",
+    "file": "chain.svg",
+    "subject": "Horizontal chain of interlocking links, tileable"
+  },
+  {
+    "id": "runes_tile",
+    "file": "runes_tile.svg",
+    "subject": "One line of invented, illegible runic script, tileable horizontally"
+  },
+  {
+    "id": "page_curl",
+    "file": "page_curl.svg",
+    "subject": "Bottom-right page corner curling up (turn page)"
+  },
+  {
+    "id": "scroll_finial",
+    "file": "scroll_finial.svg",
+    "subject": "Turned wooden knob at the end of a scroll rod, side view, rod stub on the left"
+  },
+  {
+    "id": "scroll_edge",
+    "file": "scroll_edge.svg",
+    "subject": "Torn parchment edge, tileable horizontally, solid at the bottom, torn at the top"
+  },
+  {
+    "id": "quill_inkpot",
+    "file": "quill_inkpot.svg",
+    "subject": "Empty-page vignette: inkpot with a quill and ink drops"
+  },
+  {
+    "id": "ritual_circle",
+    "file": "ritual_circle.svg",
+    "subject": "Ritual diagram: three concentric rings, invented rune marks, eight candle and stone markers, empty centre"
+  }
+]

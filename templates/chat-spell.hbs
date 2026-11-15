@@ -1,15 +1,18 @@
-<div class="wfrp4e-grimoires-chat">
+<div class="wfrp4e-grimoires-chat" data-lore="{{theme}}">
+  <span class="gr-chat-marg" data-gr-glyph="{{marginalia}}"></span>
   <header>
     {{#if img}}<img src="{{img}}" alt="">{{/if}}
+    <span class="gr-chat-sigil" data-gr-glyph="{{glyph}}"></span>
     <div>
       <h3>{{name}}</h3>
       <span class="lore">{{lore}}{{#if cn}} · {{localize "WFRP4E_GRIMOIRE.CNShort"}} {{cn}}{{/if}}</span>
     </div>
+    {{#if cn}}<span class="gr-chat-cn" data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Stat.CN'}}"><span data-gr-glyph="orn-cn_medallion"></span><b>{{cn}}</b></span>{{/if}}
   </header>
   <div class="stats">
-    {{#if range}}<span><b>{{localize "WFRP4E_GRIMOIRE.Stat.Range"}}:</b> {{range}}</span>{{/if}}
-    {{#if target}}<span><b>{{localize "WFRP4E_GRIMOIRE.Stat.Target"}}:</b> {{target}}</span>{{/if}}
-    {{#if duration}}<span><b>{{localize "WFRP4E_GRIMOIRE.Stat.Duration"}}:</b> {{duration}}</span>{{/if}}
+    {{#if range}}<span><span class="gr-chat-icon" data-gr-glyph="ui-stat_range"></span><b>{{localize "WFRP4E_GRIMOIRE.Stat.Range"}}:</b> {{range}}</span>{{/if}}
+    {{#if target}}<span><span class="gr-chat-icon" data-gr-glyph="ui-stat_target"></span><b>{{localize "WFRP4E_GRIMOIRE.Stat.Target"}}:</b> {{target}}</span>{{/if}}
+    {{#if duration}}<span><span class="gr-chat-icon" data-gr-glyph="ui-stat_duration"></span><b>{{localize "WFRP4E_GRIMOIRE.Stat.Duration"}}:</b> {{duration}}</span>{{/if}}
   </div>
   <div class="description">{{{description}}}</div>
   <footer><i class="fa-solid fa-book-journal-whills"></i> {{book}}</footer>

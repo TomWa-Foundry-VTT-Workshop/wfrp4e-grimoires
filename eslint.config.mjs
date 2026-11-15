@@ -10,6 +10,7 @@ const foundryGlobals = {
   Hooks: "readonly",
   CONFIG: "readonly",
   CONST: "readonly",
+  Handlebars: "readonly",
   ChatMessage: "readonly",
   Actor: "readonly",
   Item: "readonly",

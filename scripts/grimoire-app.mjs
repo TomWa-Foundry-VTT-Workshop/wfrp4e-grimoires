@@ -5,22 +5,32 @@
 import { MODULE_ID, I18N, t } from "./constants.mjs";
 import { addEntry, groupEntries, illegible, moveEntry, readBook, removeEntry, writeBook } from "./grimoire-data.mjs";
 import { SPELL_TYPE } from "./spell-data.mjs";
-import { entryFromDrop, entryPages, typeOf } from "./entry-types.mjs";
+import { entryFromDrop, entryPages, entryWholeBook, typeOf } from "./entry-types.mjs";
 import { LANGUAGES, normalize } from "./names.mjs";
 import { requirementBadges } from "./requirements.mjs";
 import { bookContext, syncCopies } from "./actors.mjs";
-import { CIPHERED, OPEN, WARDED, decodeNeeded, entryProgress, fits, freePages, pageState, pagesUsed } from "./book-rules.mjs";
+import { CIPHERED, OPEN, WARDED, decodeNeeded, entryProgress, freePages, freeSlots, noRoomReason, pageState, pagesUsed, slotsUsed } from "./book-rules.mjs";
 import { copyAction, corruptionLabel, lockedActions, runEntryAction } from "./book-actions.mjs";
+import { actionGlyph, applyAccessibility, badgeGlyph, isLightCover, loreGlyph, loreMarginalia, loreTheme, statGlyph, statusGlyph, useIlluminated } from "./ui.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 const TextEditorImpl = () => foundry.applications.ux.TextEditor.implementation;
 
 export const languageLabel = (key) => (game.i18n.has(`${I18N}.Languages.${key}`) ? t(`Languages.${key}`) : key);
 
-const LOCKED_ICONS = { [CIPHERED]: "fa-lock", [WARDED]: "fa-skull" };
+const LOCKED_ICONS = { [CIPHERED]: "fa-lock", [WARDED]: "fa-skull", unread: "fa-book" };
+
+/**
+ * Stan strony pokazywany użytkownikowi. Gracz nie wie, że strona jest zakazana, dopóki nie zacznie lektury:
+ * widzi ją jako nieprzeczytaną, bez ostrzeżeń o Zepsuciu. MG widzi prawdziwy stan.
+ */
+const shownState = (state, isGM) => (state === WARDED && !isGM ? "unread" : state);
 
 /** Opis wady przepisanego wpisu. */
 const flawText = (type) => `${t("Page.Flawed")}: ${type.flawNote?.() ?? ""}`;
+
+/** Rozkładówka spisu treści w wyglądzie iluminowanym (pozostałe rozkładówki to identyfikatory wpisów). */
+const CONTENTS = "contents";
 
 /** Pole wyboru warunku w trybie edycji. */
 const REQUIREMENT_TOGGLES = ["readWrite", "language", "carried", "lore"];
@@ -28,6 +38,9 @@ const REQUIREMENT_TOGGLES = ["readWrite", "language", "carried", "lore"];
 export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
   /** Otwarte okna według UUID księgi (jedno okno na księgę). */
   static #open = new Map();
+
+  /** Ostatnio otwarta rozkładówka każdej księgi (na czas sesji). */
+  static #views = new Map();
 
   static open(book) {
     const existing = GrimoireApp.#open.get(book.uuid);
@@ -57,7 +70,9 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
       toggleEdit: GrimoireApp.#onToggleEdit,
       removeEntry: GrimoireApp.#onRemove,
       moveUp: GrimoireApp.#onMove,
-      moveDown: GrimoireApp.#onMove
+      moveDown: GrimoireApp.#onMove,
+      turnPage: GrimoireApp.#onTurnPage,
+      goContents: GrimoireApp.#onGoContents
     }
   };
 
@@ -69,6 +84,7 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
     super({ id: `${MODULE_ID}-${book.uuid.replaceAll(".", "-")}`, ...options });
     this.book = book;
     this.selectedId = null;
+    this.view = GrimoireApp.#views.get(book.uuid) ?? CONTENTS;
     this.editMode = false;
     this.search = "";
   }
@@ -106,7 +122,27 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
       });
     // Szyfr zasłania także tytuł strony; MG widzi treść, ale stan pozostaje stanem postaci
     const titleHidden = (row) => hidden || (row.state === CIPHERED && !isGM);
+    const describe = (entry) => ({ ...typeOf(entry).group(entry), order: typeOf(entry).order ?? 0 });
+    const rowById = new Map(rows.map((r) => [r.entry.id, r]));
+    // Kolejność rozkładówek: jak w spisie treści, bez filtra wyszukiwania
+    const order = groupEntries(rows.map((r) => r.entry), describe).flatMap((group) => group.entries.map((entry) => entry.id));
+    const illuminated = useIlluminated();
+    if (illuminated) {
+      if (this.view !== CONTENTS && !order.includes(this.view)) this.view = CONTENTS;
+      if (this.view !== CONTENTS) this.selectedId = this.view;
+      GrimoireApp.#views.set(this.book.uuid, this.view);
+    }
     if (!this.selectedId || !rows.some((r) => r.entry.id === this.selectedId)) this.selectedId = rows[0]?.entry.id ?? null;
+
+    // Foliały: karta tytułowa to f. 1, wpisy po kolei według zajmowanych stron
+    const folios = new Map();
+    let nextFolio = 2;
+    for (const id of order) {
+      const size = entryPages(rowById.get(id).entry);
+      folios.set(id, size > 1 ? `${nextFolio}–${nextFolio + size - 1}` : `${nextFolio}`);
+      nextFolio += size;
+    }
+    const rowTheme = (row) => (titleHidden(row) || row.type.id !== SPELL_TYPE ? "arcane" : loreTheme(row.type.group(row.entry).key));
 
     const query = normalize(this.search);
     const visible = rows.filter((r) => !query || titleHidden(r) || normalize(r.type.name(r.entry)).includes(query));
@@ -123,8 +159,13 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
       const labelKey = typeOf(group.entries[0]).labelKey;
       // Nagłówek działu nie może zdradzać, co kryją strony zaszyfrowane
       const showType = multipleTypes && firstOfType && labelKey && group.entries.some((entry) => !titleHidden(byId.get(entry.id)));
+      const groupType = typeOf(group.entries[0]).id;
+      // Kolor i sigil szkoły zdradzałyby treść stron, których postać nie może odczytać
+      const veiled = group.entries.every((entry) => titleHidden(byId.get(entry.id)));
       return {
         lore: group.key,
+        theme: veiled ? "arcane" : groupType === SPELL_TYPE ? loreTheme(group.key) : "arcane",
+        glyph: veiled ? "lore-arcane" : loreGlyph(group.key, groupType),
         typeLabel: showType ? game.i18n.localize(labelKey) : null,
         label: hidden ? illegible(group.label) : group.label,
         entries: group.entries.map((entry) => {
@@ -138,10 +179,12 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
               ? `${entryProgress(book, ctx.actorId, entry.id)}/${decodeNeeded(book, entryPages(entry))}`
               : locked ? "" : row.type.corner?.(entry, row.status, ctx) ?? "",
             status: row.status,
-            statusLabel: locked ? t(`Page.${row.state}`) : row.type.statusLabel(row.status),
-            statusIcon: locked ? LOCKED_ICONS[row.state] : row.type.statusIcon?.(row.status) ?? "",
+            statusLabel: locked ? t(`Page.${shownState(row.state, isGM)}`) : row.type.statusLabel(row.status),
+            statusIcon: locked ? LOCKED_ICONS[shownState(row.state, isGM)] : row.type.statusIcon?.(row.status) ?? "",
+            statusGlyph: statusGlyph(locked ? shownState(row.state, isGM) : row.status),
             flawed: Boolean(entry.flawed),
             flawedLabel: entry.flawed ? flawText(row.type) : "",
+            folio: folios.get(entry.id),
             selected: entry.id === this.selectedId
           };
         })
@@ -158,19 +201,38 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
       const info = await type.details(entry, locked ? "none" : selected.status, ctx);
       const copy = !locked && !hidden ? copyAction(this.book, entry, selected.status, ctx) : null;
       const baseNote = locked
-        ? t(`Page.Note.${state}`, { strength: book.forbidden ? corruptionLabel(book.forbidden).toLocaleLowerCase() : "" })
+        ? t(`Page.Note.${shownState(state, isGM)}`, { strength: book.forbidden ? corruptionLabel(book.forbidden).toLocaleLowerCase() : "" })
         : info.note;
+      // Szkoła wybranego wpisu wyznacza motyw strony (kolor rubryk, sigil, marginalia)
+      const loreKey = type.group(entry).key;
       details = {
         id: entry.id,
+        theme: concealed || type.id !== SPELL_TYPE ? "arcane" : loreTheme(loreKey),
+        glyph: concealed ? "lore-arcane" : loreGlyph(loreKey, type.id),
+        marginalia: concealed ? "marg-arcane" : loreMarginalia(loreKey, type.id),
         name: titleHidden(selected) ? illegible(name) : name,
         subtitle: titleHidden(selected) ? illegible(info.subtitle) : concealed ? "" : info.subtitle,
         stats: info.stats,
         description: concealed ? "" : info.description,
         hidden: concealed,
-        hiddenNote: hidden ? t("Illegible") : locked ? t(`Page.Sealed.${state}`) : "",
+        // Strona zamknięta: szyfr (postęp jako pieczęcie), zakazana albo nieczytelna dla postaci
+        lockState: hidden ? "illegible" : locked && !isGM ? shownState(state, isGM) : null,
+        cipher: state === CIPHERED ? (() => {
+          const needed = decodeNeeded(book, entryPages(entry));
+          const done = Math.min(needed, entryProgress(book, ctx.actorId, entry.id));
+          return { needed, done, seals: Array.from({ length: Math.min(needed, 12) }, (_, i) => ({ filled: i < done })) };
+        })() : null,
+        hiddenNote: hidden ? t("Illegible") : locked ? t(`Page.Sealed.${shownState(state, isGM)}`) : "",
         status: selected.status,
+        folio: folios.get(entry.id),
+        statusGlyph: statusGlyph(locked ? shownState(state, isGM) : selected.status),
+        wholeBook: entryWholeBook(entry),
+        // Na stronie iluminowanej PM stoi w medalionie, reszta parametrów obok z ikonami
+        medallion: concealed ? null : info.stats.find((s) => s.key === "CN") ?? null,
+        sideStats: info.stats.filter((s) => s.key !== "CN").map((s) => ({ ...s, glyph: statGlyph(s.key) })),
         note: entry.flawed && !locked ? `${flawText(type)} ${baseNote}`.trim() : baseNote,
-        actions: hidden ? [] : locked ? lockedActions(state, ctx) : [...info.actions, ...(copy ? [copy] : [])]
+        actions: (hidden ? [] : locked ? lockedActions(state, ctx) : [...info.actions, ...(copy ? [copy] : [])])
+          .map((action) => ({ ...action, glyph: actionGlyph(action) }))
       };
     }
 
@@ -178,22 +240,49 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const difficulties = Object.entries(game.wfrp4e?.config?.difficultyLabels ?? {}).map(([key, label]) => ({
       key, label: game.i18n.localize(label), selected: book.cipher?.difficulty === key
     }));
+    const index = this.view === CONTENTS ? 0 : order.indexOf(this.view) + 1;
+    const spread = illuminated ? {
+      contents: this.view === CONTENTS,
+      index,
+      total: order.length + 1,
+      prev: index > 0,
+      next: index < order.length,
+      ribbons: order.map((id) => {
+        const row = rowById.get(id);
+        const name = row.type.name(row.entry);
+        return { id, theme: rowTheme(row), label: titleHidden(row) ? illegible(name) : name, active: id === this.view };
+      }),
+      // Wolne zapisy jako czyste karty; bez limitu jedna czysta karta w trybie edycji (cel upuszczenia)
+      emptySlots: book.slots
+        ? Array.from({ length: Math.min(freeSlots(book, entryWholeBook), 12) }, (_, i) => i)
+        : this.editMode && this.canEdit ? [0] : []
+    } : null;
+
     return {
+      illuminated,
+      spread,
       book: this.book,
       cover: book.cover,
+      lightCover: isLightCover(book.cover),
+      // Ręce zajmowane przez księgę „przy sobie” (gdy postać jej wymaga przy sobie)
+      handsLabel: book.hands ? t(`Badge.hands${book.hands}`) : "",
       languageLabel: languageLabel(book.language),
       languages: Object.keys(LANGUAGES).map((key) => ({ key, label: languageLabel(key), selected: key === book.language })),
       customLanguage: LANGUAGES[book.language] ? "" : book.language,
       badges: actor ? requirementBadges(reading, book.requirements).map((b) => ({
         ...b,
+        glyph: badgeGlyph(b.key),
         label: b.key === "language" ? t("Badge.language", { language: languageLabel(book.language) }) : t(`Badge.${b.key}`)
       })) : [],
       requirementToggles: REQUIREMENT_TOGGLES
         .filter((key) => key !== "lore" || hasSpells)
         .map((key) => ({ key, label: t(`Edit.Needs.${key}`), checked: book.requirements[key] })),
+      slotsLabel: book.slots ? t("Badge.slots", { used: slotsUsed(book, entryWholeBook), total: book.slots }) : "",
       pagesLabel: book.pages ? t("Badge.pages", { used: pagesUsed(book, entryPages), total: book.pages }) : "",
       // Reguły księgi ustala MG: inaczej gracz sam zdjąłby szyfr ze swojej księgi
       rules: isGM ? {
+        slots: book.slots ?? "",
+        hands: [2, 1, 0].map((value) => ({ value, label: t(`Edit.HandsOptions.${value}`), selected: book.hands === value })),
         pages: book.pages ?? "",
         cipherOff: !book.cipher,
         difficulties,
@@ -216,6 +305,37 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
   _onRender(context, options) {
     super._onRender(context, options);
     const html = this.element;
+
+    html.classList.toggle("gr-illuminated", Boolean(context.illuminated));
+    html.dataset.lore = context.illuminated && context.spread?.contents ? "" : context.details?.theme ?? "";
+    applyAccessibility(html);
+    if (context.illuminated) {
+      this._spreadOrder = context.spread.ribbons.map((r) => r.id);
+      if (this._lastView !== this.view) this._sheet = 0;
+      this._lastView = this.view;
+      requestAnimationFrame(() => this.#paginate(html));
+      if (this._turnDirection) {
+        const spreadEl = html.querySelector(".gr-spread");
+        spreadEl?.classList.add(`turning-${this._turnDirection}`);
+        // Nowa rozkładówka przejmuje fokus, żeby strzałki działały dalej
+        spreadEl?.focus({ preventScroll: true });
+        this._turnDirection = null;
+      }
+      // Klawiatura: strzałki przewracają karty, Home wraca do spisu treści
+      if (this._keysBoundTo !== html) {
+        this._keysBoundTo = html;
+        // Zmiana rozmiaru okna zmienia szerokość karty, więc dzielimy opis od nowa
+        new ResizeObserver(() => this.#paginate(this.element)).observe(html);
+        html.addEventListener("keydown", (ev) => {
+          if (!useIlluminated() || ev.target.closest("input, select, textarea, [contenteditable]")) return;
+          if (ev.key === "ArrowRight" || ev.key === "PageDown") this.#turn("next");
+          else if (ev.key === "ArrowLeft" || ev.key === "PageUp") this.#turn("prev");
+          else if (ev.key === "Home") this.#goTo(CONTENTS, { direction: "prev" });
+          else return;
+          ev.preventDefault();
+        });
+      }
+    }
 
     // Tytuł okna nadążający za nazwą księgi
     if (this.window?.title) this.window.title.textContent = this.title;
@@ -241,6 +361,11 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
       }));
     }
 
+    html.querySelector("select[name=hands]")?.addEventListener("change", (ev) => this.#updateBook({ hands: Number(ev.target.value) }));
+    html.querySelector("input[name=slots]")?.addEventListener("change", (ev) => {
+      const slots = Number.parseInt(ev.target.value, 10);
+      this.#updateBook({ slots: slots > 0 ? slots : null });
+    });
     html.querySelector("input[name=pages]")?.addEventListener("change", (ev) => {
       const pages = Number.parseInt(ev.target.value, 10);
       this.#updateBook({ pages: pages > 0 ? pages : null });
@@ -255,8 +380,17 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
     // Element główny okna jest ten sam między renderami – nasłuch tylko raz
     if (this.canEdit && this._dropBoundTo !== html) {
       this._dropBoundTo = html;
-      html.addEventListener("dragover", (ev) => ev.preventDefault());
-      html.addEventListener("drop", (ev) => this.#onDrop(ev));
+      html.addEventListener("dragover", (ev) => {
+        ev.preventDefault();
+        html.classList.add("gr-dropping");
+      });
+      html.addEventListener("dragleave", (ev) => {
+        if (!html.contains(ev.relatedTarget)) html.classList.remove("gr-dropping");
+      });
+      html.addEventListener("drop", (ev) => {
+        html.classList.remove("gr-dropping");
+        this.#onDrop(ev);
+      });
     }
 
     if (this._turnPage) {
@@ -278,7 +412,10 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!found) return ui.notifications.warn(t("Notify.NotWritable"));
     const { entry, type } = found;
     if (type.canWrite && !type.canWrite()) return ui.notifications.warn(game.i18n.localize(type.writeDeniedKey ?? `${I18N}.Notify.NotWritable`));
-    if (!fits(this.data, entry, entryPages)) {
+    const noRoom = noRoomReason(this.data, entry, entryPages, entryWholeBook);
+    if (noRoom === "whole") return ui.notifications.warn(t("Notify.WholeBook"));
+    if (noRoom === "slots") return ui.notifications.warn(t("Notify.NoSlot", { total: this.data.slots }));
+    if (noRoom === "pages") {
       return ui.notifications.warn(t("Notify.NoRoom", { needed: entryPages(entry), free: freePages(this.data, entryPages) }));
     }
     const { book, added } = addEntry(this.data, entry, type.same);
@@ -294,10 +431,87 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static #onSelect(_event, target) {
     const id = target.closest("[data-entry-id]")?.dataset.entryId;
-    if (!id || id === this.selectedId) return;
+    if (!id) return;
+    if (useIlluminated()) return this.#goTo(id);
+    if (id === this.selectedId) return;
     this.selectedId = id;
     this._turnPage = true;
     this.render({ parts: ["book"] });
+  }
+
+  /* ---------- Rozkładówki (wygląd iluminowany) ---------- */
+
+  /** Przechodzi do rozkładówki: spisu treści albo wpisu. */
+  #goTo(view, { direction, lastSheet = false } = {}) {
+    if (view === this.view) return;
+    const order = this._spreadOrder ?? [];
+    const from = this.view === CONTENTS ? 0 : order.indexOf(this.view) + 1;
+    const to = view === CONTENTS ? 0 : order.indexOf(view) + 1;
+    this._turnDirection = direction ?? (to >= from ? "next" : "prev");
+    this._openOnLastSheet = lastSheet;
+    this.view = view;
+    if (view !== CONTENTS) this.selectedId = view;
+    this.render({ parts: ["book"] });
+  }
+
+  /** Następna lub poprzednia karta: najpierw dalszy ciąg opisu, potem kolejna rozkładówka. */
+  #turn(direction) {
+    const flow = this.element?.querySelector(".gr-flow");
+    const sheets = Number(flow?.dataset.sheets ?? 1);
+    if (flow && direction === "next" && this._sheet < sheets - 1) return this.#showSheet(flow, this._sheet + 1);
+    if (flow && direction === "prev" && this._sheet > 0) return this.#showSheet(flow, this._sheet - 1);
+    const order = [CONTENTS, ...(this._spreadOrder ?? [])];
+    const index = order.indexOf(this.view);
+    const target = order[index + (direction === "next" ? 1 : -1)];
+    if (target) this.#goTo(target, { direction, lastSheet: direction === "prev" });
+  }
+
+  static #onTurnPage(_event, target) {
+    this.#turn(target.dataset.dir === "prev" ? "prev" : "next");
+  }
+
+  static #onGoContents() {
+    this.#goTo(CONTENTS, { direction: "prev" });
+  }
+
+  /**
+   * Dzieli opis wpisu na karty (kolumny o szerokości strony) zamiast przewijać stronę.
+   * Liczba kart trafia do `data-sheets`, a licznik i rogi stron odświeżają się bez ponownego renderu.
+   */
+  #paginate(html) {
+    const flow = html.querySelector(".gr-flow");
+    if (!flow) return;
+    const inner = flow.querySelector(".gr-flow-inner");
+    const gap = 48;
+    const width = flow.clientWidth;
+    if (!width || !inner) return;
+    inner.style.columnWidth = `${width}px`;
+    inner.style.columnGap = `${gap}px`;
+    inner.style.height = `${flow.clientHeight}px`;
+    const sheets = Math.max(1, Math.round((inner.scrollWidth + gap) / (width + gap)));
+    flow.dataset.sheets = String(sheets);
+    flow.dataset.step = String(width + gap);
+    const sheet = this._openOnLastSheet ? sheets - 1 : Math.min(this._sheet ?? 0, sheets - 1);
+    this._openOnLastSheet = false;
+    this.#showSheet(flow, sheet);
+  }
+
+  #showSheet(flow, sheet) {
+    this._sheet = sheet;
+    const sheets = Number(flow.dataset.sheets ?? 1);
+    flow.querySelector(".gr-flow-inner").style.transform = `translateX(-${sheet * Number(flow.dataset.step ?? 0)}px)`;
+    const root = this.element;
+    const counter = root.querySelector(".gr-sheet-counter");
+    if (counter) {
+      counter.hidden = sheets < 2;
+      counter.textContent = t("Spread.Sheet", { sheet: sheet + 1, sheets });
+    }
+    const order = [CONTENTS, ...(this._spreadOrder ?? [])];
+    const index = order.indexOf(this.view);
+    const prev = root.querySelector(".gr-turn.prev");
+    const next = root.querySelector(".gr-turn.next");
+    if (prev) prev.disabled = index <= 0 && sheet <= 0;
+    if (next) next.disabled = index >= order.length - 1 && sheet >= sheets - 1;
   }
 
   static async #onEntryAction(_event, target) {

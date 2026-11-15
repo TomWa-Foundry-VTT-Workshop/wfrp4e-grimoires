@@ -23,6 +23,7 @@
  *   writeDeniedKey                → (opcjonalne) komunikat, gdy nie może
  *   visible(entry, ctx)           → (opcjonalne) czy gracz widzi wpis
  *   pages(entry)                  → (opcjonalne) ile stron zajmuje wpis, domyślnie 1
+ *   wholeBook(entry)              → (opcjonalne) czy wpis zajmuje wszystkie zapisy księgi (np. rytuał)
  *   canCopy(entry, status, ctx)   → (opcjonalne) czy postać może przepisać wpis
  *   applyFlaw(entry)              → (opcjonalne) wpis po nieudanym przepisaniu
  *   flawNote()                    → (opcjonalne) opis skutku wady
@@ -75,6 +76,11 @@ export function typeOf(entry) {
 /** Liczba stron zajmowanych przez wpis. */
 export function entryPages(entry) {
   return Math.max(1, typeOf(entry).pages?.(entry) ?? 1);
+}
+
+/** Czy wpis zajmuje całą księgę (wszystkie zapisy). */
+export function entryWholeBook(entry) {
+  return Boolean(typeOf(entry).wholeBook?.(entry));
 }
 
 /** Pierwszy typ, który rozpoznaje upuszczone dane. */

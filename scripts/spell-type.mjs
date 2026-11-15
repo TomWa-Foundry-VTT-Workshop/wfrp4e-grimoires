@@ -12,6 +12,7 @@ import { castFromBook, requestMemorize } from "./actors.mjs";
 import { castFromScroll } from "./scrolls.mjs";
 import { scrollCount } from "./scroll-data.mjs";
 import { getSettings } from "./settings.mjs";
+import { loreGlyph, loreMarginalia, loreTheme } from "./ui.mjs";
 
 const TextEditorImpl = () => foundry.applications.ux.TextEditor.implementation;
 
@@ -26,7 +27,7 @@ const STATUS_ICONS = {
 };
 
 function stat(key, value, hint) {
-  return { label: t(`Stat.${key}`), value, hint };
+  return { key, label: t(`Stat.${key}`), value, hint };
 }
 
 /** Akcje "tylko do przeglądania", wspólne dla księgi i zwoju. */
@@ -84,6 +85,9 @@ async function postToChat(entry, ctx) {
   const content = await foundry.applications.handlebars.renderTemplate(`modules/${MODULE_ID}/templates/chat-spell.hbs`, {
     ...s,
     lore: loresText(s),
+    theme: loreTheme(s.lores[0] ?? ""),
+    glyph: loreGlyph(s.lores[0] ?? ""),
+    marginalia: loreMarginalia(s.lores[0] ?? ""),
     description: await TextEditorImpl().enrichHTML(s.description),
     book: ctx.item.name
   });
@@ -113,6 +117,7 @@ export const spellType = {
   name: (entry) => entry.data.name,
 
   pages: (entry) => spellPages(spellSummary(entry.data)),
+  wholeBook: (entry) => spellSummary(entry.data).isRitual,
   applyFlaw: flawSpell,
   flawNote: () => t("Page.FlawSpell", { penalty: FLAW_CN_PENALTY }),
 

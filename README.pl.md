@@ -15,10 +15,32 @@ Księgi i zwoje dla **WFRP4e 10.x**: osobne działy w ekwipunku i okno otwartej 
 
 * **Lewa strona**: zaklęcia pogrupowane według Tradycji, z PM, wyszukiwarką i znacznikami: *zapamiętane* ✔, *na karcie, niezapamiętane* 📖 oraz *tylko do czytania* 👁.
 * **Prawa strona**: PM, zasięg, cel, czas trwania i pełny opis wybranego czaru. Strona przewraca się przy wyborze zaklęcia.
+* W wyglądzie *Iluminowanym* (domyślnym) księga otwiera się na karcie tytułowej i spisie treści z numerami kart oraz czystymi kartami na wolne zapisy. Każdy zapis ma własną rozkładówkę; strony przewraca się rogami kart, strzałkami (Home wraca do spisu) albo kolorowymi wstążkami pod kartami. Długi opis przechodzi na kolejną kartę.
 * **Nagłówek**: plakietki warunków dla postaci, czyli Czytanie/Pisanie, język księgi i Przy sobie.
 * **Akcje**: **Rzuć z księgi**, **Splataj** (4e), **Zapamiętaj**, **Na czat**, **Karta zaklęcia**.
 * Postać, która nie umie przeczytać księgi, widzi nieczytelne runy zamiast nazw zaklęć. MG zawsze widzi treść.
 * **Tryb edycji** (przycisk ✒, tylko właściciel i MG): przeciąganie wpisów na księgę, kolejność, usuwanie, język (Magiczny, Reikspiel, Eltharin… albo własny), kolor oprawy oraz to, czego ta księga wymaga od czytelnika: umiejętności czytania, znajomości języka, noszenia przy sobie, a przy zaklęciach także znajomości Tradycji.
+
+## 🎨 Wygląd iluminowany
+
+Domyślnie (ustawienie klienta **Wygląd ksiąg**) księga wygląda jak iluminowana księga zaklęć: skórzana oprawa w kolorze księgi z mosiężnymi okuciami, pergaminowe karty, złocone tytuły czcionkami WFRP4e i jedwabne wstążki zwisające spod kart.
+
+* **Strony**: księga otwiera się na karcie tytułowej i spisie treści. Każdy zapis ma własną rozkładówkę, a długi opis przechodzi na kolejne karty. Strony przewraca się rogami kart, strzałkami (Home wraca do spisu) albo wstążkami.
+* **Szkoły magii**: każda ma własny kolor atramentu, sigil i marginalia w rogach oraz własny znak na stronie, np. przypalone brzegi dla Ognia, żałobną obwódkę dla Śmierci, mapę nieba dla Niebios, czarne rubryki dla Demonologii.
+* **Rytuał** wypełnia całą księgę i dostaje krąg rytualny oraz numerowane rubryki.
+* **Strony zamknięte**: runy i zamek z pieczęciami postępu odczytu, łańcuchy i pieczęć z czaszką dla stron zakazanych. Kolory nie zdradzają szkoły strony, której postać nie może odczytać.
+* **Skryptorium**: tryb edycji to pulpit pisarski, a czyste karty świecą, gdy przeciągasz zaklęcie nad księgę.
+* **Zwój i czat**: zwój ma woskową pieczęć swojej szkoły, a zaklęcie wysłane na czat wygląda jak strona wyrwana z księgi.
+* Wszystko działa z klawiatury, a każda ikona ma opis dla czytników ekranu. Zrzuty pokazują interfejs angielski.
+
+| | |
+|---|---|
+| ![Spis treści](docs/screenshots/illuminated-contents.png) | ![Rozkładówka zaklęcia](docs/screenshots/illuminated-spell.png) |
+| ![Rytuał](docs/screenshots/illuminated-ritual.png) | ![Strona zaszyfrowana](docs/screenshots/illuminated-cipher.png) |
+
+![Szkoły magii](docs/screenshots/illuminated-schools.png)
+
+![Zwój, karta czatu i strona zakazana](docs/screenshots/illuminated-scroll-chat.png)
 
 ## ✨ Zaklęcia z księgi na karcie
 
@@ -32,11 +54,14 @@ Gdy księga jest przy postaci, każde zaklęcie, które postać może z niej rzu
 
 ## 🔏 Czego może wymagać księga
 
-Wszystko jest domyślnie wyłączone. MG ustawia to przy każdej księdze w trybie edycji.
+Nowa księga mieści **4 zapisy**, bo zwykła księga magii zawiera około czterech zaklęć. **Rytuał zajmuje całą księgę**: można go wpisać tylko do pustej, a po nim nic więcej się nie zmieści. MG zmienia liczbę zapisów przy każdej księdze w trybie edycji albo zostawia pole puste (bez limitu). Księgi sprzed tej zasady, zwoje i księgi receptur alchemicznych nie mają limitu zapisów.
+
+Wszystko poniżej jest domyślnie wyłączone. MG ustawia to przy każdej księdze w trybie edycji.
 
 * **Strony**: limit tego, co się zmieści. Zaklęcie zajmuje 1 stronę, plus 1 na każde 5 PM.
 * **Szyfr**: każdą stronę trzeba odczytać testem wybranej umiejętności (domyślnie języka księgi). Każdy sukces dodaje swoje PS, a strona wymaga ustawionej liczby PS na stronę. Pech albo porażka o 3 PS lub więcej kasuje pracę nad tą stroną. Postęp należy do postaci.
-* **Zakazana**: pierwsze przeczytanie strony to ekspozycja na Zepsucie wybranej siły, ze zwykłym testem systemu.
+* **Zakazana**: pierwsze przeczytanie strony to ekspozycja na Zepsucie wybranej siły, ze zwykłym testem systemu. Gracz nie wie o tym z góry: widzi zwykłą nieprzeczytaną stronę z przyciskiem **Przeczytaj stronę** i o Zepsuciu dowiaduje się dopiero z testu. MG widzi ostrzeżenie wszędzie.
+* **Ręce**: księgę noszoną przy sobie trzyma się domyślnie w obu rękach (MG może ustawić jedną rękę albo żadną). Wlicza się do punktów wyposażenia postaci jak broń, więc przy systemowym ustawieniu ograniczającym broń postać nie utrzyma księgi i broni ponad wolne ręce, a nagłówek pokazuje, ile rąk zajmuje księga.
 
 **Przepisz do innej księgi** zapisuje wpis w innej księdze postaci po teście Wymagającym. Porażka daje wadliwy odpis (zaklęcie ma PM +2), a porażka o 2 PS lub więcej niszczy odpis.
 
@@ -51,6 +76,8 @@ Wszystko jest domyślnie wyłączone. MG ustawia to przy każdej księdze w tryb
 
 * Nieudany test zużywa zwój
 * Nazywaj zwoje od zawartości
+
+Każdy gracz wybiera też **Wygląd ksiąg** (ustawienie klienta): *Iluminowany* (domyślny) pokazuje oprawną w skórę księgę zaklęć z mosiężnymi okuciami, w stylu szkoły magii, a *Klasyczny* zostawia prosty wygląd.
 
 To, czego księga wymaga od czytelnika, ustawia się przy każdej księdze w trybie edycji.
 

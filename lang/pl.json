@@ -27,7 +27,10 @@
       "language": "Język ({language})",
       "carried": "Przy sobie",
       "notCarried": "Nie przy sobie",
-      "pages": "Strony: {used}/{total}"
+      "slots": "Zapisy: {used}/{total}",
+      "pages": "Strony: {used}/{total}",
+      "hands1": "1 ręka",
+      "hands2": "2 ręce"
     },
     "Status": {
       "known": "Znasz to zaklęcie",
@@ -79,6 +82,8 @@
         "carried": "Trzeba mieć przy sobie",
         "lore": "Trzeba znać Tradycję"
       },
+      "SlotsHint": "Ile zaklęć mieści księga. Zwykła księga magii mieści 4; rytuał zajmuje całą księgę. Wpisz dowolną liczbę albo zostaw puste (bez limitu).",
+      "Slots": "Mieści zaklęć",
       "Pages": "Strony",
       "Cipher": "Szyfr",
       "CipherNone": "Brak",
@@ -86,7 +91,14 @@
       "CipherSkillDefault": "Język księgi",
       "CipherSL": "PS na stronę",
       "Forbidden": "Zakazana",
-      "ForbiddenNone": "Nie"
+      "ForbiddenNone": "Nie",
+      "Hands": "Trzymana w",
+      "HandsHint": "Ile rąk zajmuje księga noszona przy sobie. Księgę magii trzyma się w obu rękach; przy systemowym limicie broni postać nie utrzyma księgi i broni ponad wolne ręce.",
+      "HandsOptions": {
+        "2": "obu rękach",
+        "1": "jednej ręce",
+        "0": "bez rąk"
+      }
     },
     "Learn": {
       "Title": "Zapamiętanie zaklęcia",
@@ -111,13 +123,21 @@
     "Notify": {
       "AlreadyInBook": "{name} jest już w tej księdze.",
       "NotWritable": "Tego nie da się tu zapisać.",
-      "NoRoom": "Za mało stron: potrzeba {needed}, wolnych {free}."
+      "NoRoom": "Za mało stron: potrzeba {needed}, wolnych {free}.",
+      "WholeBook": "Rytuał zajmuje całą księgę: można go wpisać tylko do pustej, a po nim nic więcej się nie zmieści.",
+      "NoSlot": "Księga jest pełna ({total} zapisy)."
     },
     "Settings": {
       "ConsumeOnFailureName": "Nieudany test zużywa zwój",
       "ConsumeOnFailureHint": "Gdy wyłączone, zwój zużywa się tylko po udanym teście rzucania.",
       "RenameScrollsName": "Nazywaj zwoje od zawartości",
-      "RenameScrollsHint": "Zapisanie wpisu zmienia nazwę zwoju."
+      "RenameScrollsHint": "Zapisanie wpisu zmienia nazwę zwoju.",
+      "BookStyleName": "Wygląd ksiąg",
+      "BookStyleHint": "Iluminowany: okna księgi i zwoju wyglądają jak iluminowana księga zaklęć, w stylu szkoły magii. Klasyczny: dotychczasowy prosty wygląd.",
+      "BookStyle": {
+        "illuminated": "Iluminowany",
+        "classic": "Klasyczny"
+      }
     },
     "Aliases": {
       "ReadWrite": "Czytanie/Pisanie",
@@ -183,11 +203,13 @@
       "warded": "Strona zakazana",
       "Note": {
         "ciphered": "Ta strona jest zaszyfrowana. Każda próba dodaje uzyskane PS; pech albo porażka o 3 PS lub więcej kasuje dotychczasową pracę.",
-        "warded": "Przeczytanie tej strony to ekspozycja na Zepsucie: {strength}."
+        "warded": "Przeczytanie tej strony to ekspozycja na Zepsucie: {strength}.",
+        "unread": "Ta strona nie została jeszcze przeczytana."
       },
       "Sealed": {
         "ciphered": "Ta strona jest zaszyfrowana.",
-        "warded": "Jeszcze nie odważono się przeczytać tej strony."
+        "warded": "Jeszcze nie odważono się przeczytać tej strony.",
+        "unread": "Ta strona jest jeszcze nieprzeczytana."
       },
       "Decipher": "Odszyfruj",
       "DecipherTitle": "Odszyfrowywanie: {book}",
@@ -207,7 +229,25 @@
       "CopiedFlawed": "Przepisano {name} do: {book}, z błędami.",
       "CopyRuined": "Odpis {name} jest do niczego.",
       "Flawed": "Wadliwy odpis",
-      "FlawSpell": "PM +{penalty}."
+      "FlawSpell": "PM +{penalty}.",
+      "unread": "Nieprzeczytana strona",
+      "ReadUnread": "Przeczytaj stronę",
+      "UnreadConfirm": "Rozpocząć lekturę tej strony?"
+    },
+    "Spread": {
+      "Contents": "Spis treści",
+      "Owner": "Własność: {name}",
+      "Folio": "k. {folio}",
+      "EmptySlot": "— czyste karty —",
+      "Ritual": "Rytuał: wypełnia całą księgę",
+      "Sheet": "Karta {sheet} z {sheets}",
+      "Prev": "Poprzednia strona (←)",
+      "Next": "Następna strona (→)",
+      "KeysHint": "Strzałki przewracają strony; Home wraca do spisu treści.",
+      "CipherProgress": "Odczytano {done} z {needed} PS"
+    },
+    "Hands": {
+      "Full": "Za mało wolnych rąk na {name}: potrzeba {need}, wolne {free} (zajmują je: {held})."
     }
   }
 }

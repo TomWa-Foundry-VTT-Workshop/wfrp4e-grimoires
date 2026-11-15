@@ -1,0 +1,168 @@
+{{!-- Iluminowana Księga: rozkładówka spisu treści albo wpisu, wstążki i rogi stron do przewracania --}}
+<div class="gr-spread {{#if spread.contents}}is-contents{{else}}is-entry{{#if details.wholeBook}} is-ritual{{/if}}{{/if}}" tabindex="0" aria-label="{{localize 'WFRP4E_GRIMOIRE.Spread.KeysHint'}}">
+  {{#if spread.contents}}
+    {{!-- ─── Karta tytułowa ─── --}}
+    <section class="grimoire-page left gr-title-page">
+      <span class="gr-frame-corner tl">{{grIcon "orn-page_frame_corner"}}</span>
+      <span class="gr-frame-corner bl">{{grIcon "orn-page_frame_corner"}}</span>
+      <div class="gr-exlibris">
+        <div class="gr-exlibris-mark">{{grIcon "ui-new_tome"}}</div>
+        <h2 class="gr-exlibris-title">{{book.name}}</h2>
+        <div class="gr-rule">{{grIcon "orn-rubric_divider"}}</div>
+        <p class="gr-exlibris-line">{{localize "WFRP4E_GRIMOIRE.WrittenIn" language=languageLabel}}</p>
+        {{#if actorName}}<p class="gr-exlibris-line"><em>{{localize "WFRP4E_GRIMOIRE.Spread.Owner" name=actorName}}</em></p>{{/if}}
+        <div class="gr-capacity">
+          {{#if slotsLabel}}<span>{{grIcon "ui-nav_contents"}} {{slotsLabel}}</span>{{/if}}
+          {{#if pagesLabel}}<span>{{grIcon "ui-req_pages"}} {{pagesLabel}}</span>{{/if}}
+        </div>
+        <div class="gr-tailpiece">{{grIcon "orn-tailpiece"}}</div>
+      </div>
+      <footer class="gr-page-foot">
+        <span class="gr-folio">{{localize "WFRP4E_GRIMOIRE.Spread.Folio" folio="1"}}</span>
+      </footer>
+    </section>
+
+    <div class="grimoire-spine"></div>
+
+    {{!-- ─── Spis treści ─── --}}
+    <section class="grimoire-page right gr-contents-page">
+      <h3 class="gr-contents-title">{{localize "WFRP4E_GRIMOIRE.Spread.Contents"}}</h3>
+      <div class="grimoire-search">
+        {{grIcon "ui-act_search"}}
+        <input type="search" name="search" value="{{search}}" placeholder="{{localize 'WFRP4E_GRIMOIRE.Search'}}">
+      </div>
+      <div class="grimoire-toc-list">
+        {{#if empty}}
+          <p class="grimoire-empty">{{#if canEdit}}{{localize "WFRP4E_GRIMOIRE.EmptyEditable"}}{{else}}{{localize "WFRP4E_GRIMOIRE.Empty"}}{{/if}}</p>
+        {{/if}}
+        {{#each groups}}
+          {{#if typeLabel}}<div class="grimoire-type-heading">{{typeLabel}}</div>{{/if}}
+          <div class="grimoire-lore lore-{{lore}}" data-lore="{{theme}}">{{grIcon glyph "gr-lore-glyph"}} {{label}}</div>
+          {{#each entries}}
+            <div class="grimoire-entry status-{{status}}" data-entry-id="{{id}}" data-action="selectEntry" data-lore="{{../theme}}" role="button" tabindex="0">
+              <span class="grimoire-entry-name">
+                {{#if statusGlyph}}<span class="gr-status" data-tooltip="{{statusLabel}}">{{grIcon statusGlyph}}</span>
+                {{else if statusIcon}}<i class="fa-solid {{statusIcon}}" data-tooltip="{{statusLabel}}"></i>{{/if}}
+                {{#if flawed}}<span class="gr-status grimoire-flawed" data-tooltip="{{flawedLabel}}">{{grIcon "ui-status_flawed"}}</span>{{/if}}
+                {{name}}
+              </span>
+              <span class="gr-dots"></span>
+              <span class="grimoire-entry-cn">{{corner}}</span>
+              <span class="gr-entry-folio">{{folio}}</span>
+              {{#if ../../editMode}}
+                <span class="grimoire-entry-edit">
+                  <a data-action="moveUp" data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Edit.Up'}}">{{grIcon "ui-act_move_up"}}</a>
+                  <a data-action="moveDown" data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Edit.Down'}}">{{grIcon "ui-act_move_down"}}</a>
+                  <a data-action="removeEntry" data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Edit.Remove'}}">{{grIcon "ui-act_remove"}}</a>
+                </span>
+              {{/if}}
+            </div>
+          {{/each}}
+        {{/each}}
+        {{#each spread.emptySlots}}
+          <div class="gr-empty-slot">{{localize "WFRP4E_GRIMOIRE.Spread.EmptySlot"}}</div>
+        {{/each}}
+      </div>
+      <footer class="gr-page-foot">
+        <button type="button" class="gr-turn next" data-action="turnPage" data-dir="next" data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Spread.Next'}}" {{#unless spread.next}}disabled{{/unless}}>{{grIcon "ui-nav_next"}}</button>
+      </footer>
+    </section>
+
+  {{else}}
+    {{!-- ─── Karta iluminowana wpisu ─── --}}
+    <section class="grimoire-page left gr-title-page" data-lore="{{details.theme}}">
+      <span class="gr-marg tl">{{grIcon details.marginalia}}</span>
+      <div class="gr-entry-head" data-entry-id="{{details.id}}">
+        <div class="gr-page-sigil">{{grIcon details.glyph}}</div>
+        <div class="grimoire-details-lore">{{details.subtitle}}</div>
+        <h2 class="grimoire-details-name">{{details.name}}</h2>
+        {{#if details.wholeBook}}<p class="gr-ritual-mark">{{grIcon "lore-ritual"}} {{localize "WFRP4E_GRIMOIRE.Spread.Ritual"}}</p>{{/if}}
+        <div class="gr-rule">{{grIcon "orn-rubric_divider"}}</div>
+        {{#if details.wholeBook}}
+          {{!-- Rytuał: krąg z sigilem szkoły w środku i PM na obwodzie --}}
+          <div class="gr-ritual-circle">
+            {{grIcon "orn-ritual_circle" "gr-ritual-art"}}
+            <span class="gr-ritual-sigil">{{grIcon details.glyph}}</span>
+            {{#if details.medallion}}<span class="gr-ritual-cn" data-tooltip="{{details.medallion.label}}">{{details.medallion.value}}</span>{{/if}}
+          </div>
+          {{#if details.medallion}}<div class="gr-medallion-label">{{details.medallion.label}}{{#if details.medallion.hint}} · <small>{{details.medallion.hint}}</small>{{/if}}</div>{{/if}}
+        {{else if details.medallion}}
+          <div class="gr-medallion" data-tooltip="{{details.medallion.label}}">
+            {{grIcon "orn-cn_medallion" "gr-medallion-art"}}
+            <span class="gr-medallion-value">{{details.medallion.value}}</span>
+          </div>
+          <div class="gr-medallion-label">{{details.medallion.label}}{{#if details.medallion.hint}} · <small>{{details.medallion.hint}}</small>{{/if}}</div>
+        {{/if}}
+        {{#unless details.hidden}}
+          <dl class="gr-side-stats">
+            {{#each details.sideStats}}
+              <div>
+                <dt>{{#if glyph}}{{grIcon glyph}}{{/if}} {{label}}</dt>
+                <dd>{{value}}{{#if hint}} <small>{{hint}}</small>{{/if}}</dd>
+              </div>
+            {{/each}}
+          </dl>
+        {{/unless}}
+        <p class="grimoire-note status-{{details.status}}">
+          {{#if details.statusGlyph}}{{grIcon details.statusGlyph}}{{/if}} {{details.note}}
+        </p>
+      </div>
+      <footer class="gr-page-foot">
+        <button type="button" class="gr-turn prev" data-action="turnPage" data-dir="prev" data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Spread.Prev'}}">{{grIcon "ui-nav_prev"}}</button>
+        <span class="gr-folio">{{localize "WFRP4E_GRIMOIRE.Spread.Folio" folio=details.folio}}</span>
+      </footer>
+    </section>
+
+    <div class="grimoire-spine"></div>
+
+    {{!-- ─── Tekst wpisu ─── --}}
+    <section class="grimoire-page right gr-text-page" data-lore="{{details.theme}}">
+      <span class="gr-marg tr">{{grIcon details.marginalia}}</span>
+      <span class="gr-watermark">{{grIcon details.glyph}}</span>
+      {{#if details.lockState}}
+        {{!-- Strona zamknięta: pismo runiczne i zamek, łańcuch albo sama nieczytelność --}}
+        <div class="gr-sealed is-{{details.lockState}}" data-entry-id="{{details.id}}">
+          <div class="gr-runes" aria-hidden="true"></div>
+          {{#if (eq details.lockState "ciphered")}}
+            <div class="gr-lock">{{grIcon "orn-lock_plate"}}</div>
+            {{#if details.cipher}}
+              <div class="gr-cipher-progress" data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Spread.CipherProgress' done=details.cipher.done needed=details.cipher.needed}}">
+                {{#each details.cipher.seals}}<span class="gr-seal-pip {{#if filled}}is-filled{{/if}}">{{grIcon "orn-wax_seal"}}</span>{{/each}}
+              </div>
+              <p class="gr-sealed-count">{{localize "WFRP4E_GRIMOIRE.Spread.CipherProgress" done=details.cipher.done needed=details.cipher.needed}}</p>
+            {{/if}}
+          {{else if (eq details.lockState "unread")}}
+            <div class="gr-unread-seal">{{grIcon "orn-wax_seal" "gr-ward-wax"}}<span>{{grIcon "ui-req_pages"}}</span></div>
+          {{else if (eq details.lockState "warded")}}
+            <div class="gr-chain" aria-hidden="true"></div>
+            <div class="gr-ward-seal">{{grIcon "orn-wax_seal" "gr-ward-wax"}}<span>{{grIcon "ui-req_forbidden"}}</span></div>
+          {{else}}
+            <div class="gr-illegible-mark">{{grIcon "ui-status_unreadable"}}</div>
+          {{/if}}
+          <p class="gr-sealed-note">{{details.hiddenNote}}</p>
+        </div>
+      {{else}}
+        <div class="gr-flow" data-entry-id="{{details.id}}">
+          <div class="gr-flow-inner grimoire-description">{{{details.description}}}</div>
+        </div>
+      {{/if}}
+      <div class="grimoire-actions" data-entry-id="{{details.id}}">
+        {{#each details.actions}}
+          <button type="button" {{#if primary}}class="primary"{{/if}} data-action="entryAction" data-entry-action="{{id}}">{{#if glyph}}{{grIcon glyph}}{{else}}<i class="fa-solid {{icon}}"></i>{{/if}} {{label}}</button>
+        {{/each}}
+      </div>
+      <footer class="gr-page-foot">
+        <span class="gr-sheet-counter" hidden></span>
+        <button type="button" class="gr-turn next" data-action="turnPage" data-dir="next" data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Spread.Next'}}" {{#unless spread.next}}disabled{{/unless}}>{{grIcon "ui-nav_next"}}</button>
+      </footer>
+    </section>
+  {{/if}}
+
+  {{!-- ─── Wstążki: spis treści i każdy zapis w kolorze szkoły ─── --}}
+  <nav class="gr-ribbons" aria-label="{{localize 'WFRP4E_GRIMOIRE.Spread.Contents'}}">
+    <button type="button" class="gr-ribbon is-contents {{#if spread.contents}}active{{/if}}" {{#if spread.contents}}aria-current="page"{{/if}} data-action="goContents" data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Spread.Contents'}}" aria-label="{{localize 'WFRP4E_GRIMOIRE.Spread.Contents'}}"></button>
+    {{#each spread.ribbons}}
+      <button type="button" class="gr-ribbon {{#if active}}active{{/if}}" {{#if active}}aria-current="page"{{/if}} data-action="selectEntry" data-entry-id="{{id}}" data-lore="{{theme}}" data-tooltip="{{label}}" aria-label="{{label}}"></button>
+    {{/each}}
+  </nav>
+</div>

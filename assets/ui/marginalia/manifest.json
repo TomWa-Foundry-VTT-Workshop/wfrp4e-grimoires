@@ -1,0 +1,82 @@
+[
+  {
+    "id": "petty",
+    "file": "petty.svg",
+    "subject": "doodled marginal sketches: little stars, a candle, ink loops"
+  },
+  {
+    "id": "arcane",
+    "file": "arcane.svg",
+    "subject": "plain double-rule corner with a small key at the joint"
+  },
+  {
+    "id": "beasts",
+    "file": "beasts.svg",
+    "subject": "antler tines and claw scratches along the edges"
+  },
+  {
+    "id": "death",
+    "file": "death.svg",
+    "subject": "mourning ribbon, hourglass at the joint, a raven feather"
+  },
+  {
+    "id": "fire",
+    "file": "fire.svg",
+    "subject": "rising flame tongues and sparks, the edge looks scorched (ragged)"
+  },
+  {
+    "id": "heavens",
+    "file": "heavens.svg",
+    "subject": "dotted constellation lines with small stars and a crescent"
+  },
+  {
+    "id": "metal",
+    "file": "metal.svg",
+    "subject": "riveted metal strip with small alchemical marks (circles, triangles, crosses as plain geometric marks)"
+  },
+  {
+    "id": "life",
+    "file": "life.svg",
+    "subject": "oak leaves, acorns and a twining vine"
+  },
+  {
+    "id": "light",
+    "file": "light.svg",
+    "subject": "rays fanning from the corner with a small sun"
+  },
+  {
+    "id": "shadow",
+    "file": "shadow.svg",
+    "subject": "wisps of smoke and a falling veil"
+  },
+  {
+    "id": "hedgecraft",
+    "file": "hedgecraft.svg",
+    "subject": "herbs, mistletoe, a knotted twine"
+  },
+  {
+    "id": "witchcraft",
+    "file": "witchcraft.svg",
+    "subject": "crude stitching, knotted cords and a small cauldron"
+  },
+  {
+    "id": "daemonology",
+    "file": "daemonology.svg",
+    "subject": "chain links and fragments of a broken circle"
+  },
+  {
+    "id": "necromancy",
+    "file": "necromancy.svg",
+    "subject": "bones, a small skull, grave-soil crumbs"
+  },
+  {
+    "id": "chaos",
+    "file": "chaos.svg",
+    "subject": "warped, writhing tendrils with eye-less blisters (shared by all chaos lores; no god symbols)"
+  },
+  {
+    "id": "ritual",
+    "file": "ritual.svg",
+    "subject": "arc of a ritual circle with invented rune marks along it"
+  }
+]

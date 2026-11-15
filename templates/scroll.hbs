@@ -1,5 +1,5 @@
 <div class="scroll-parchment">
-  <div class="scroll-rod top"></div>
+  <div class="scroll-rod top">{{#if illuminated}}<span class="gr-finial left">{{grIcon "orn-scroll_finial"}}</span><span class="gr-finial right">{{grIcon "orn-scroll_finial"}}</span>{{/if}}</div>
 
   <header class="scroll-head">
     <div class="scroll-meta">
@@ -9,12 +9,13 @@
     <div class="scroll-badges">
       {{#each badges}}
         <span class="grimoire-badge {{#if ok}}ok{{else}}missing{{/if}}">
+          {{#if (and ../illuminated glyph)}}{{grIcon glyph}}{{/if}}
           <i class="fa-solid {{#if ok}}fa-check{{else}}fa-xmark{{/if}}"></i> {{label}}
         </span>
       {{/each}}
       {{#if canEdit}}
         <button type="button" class="scroll-edit-toggle {{#if editMode}}active{{/if}}" data-action="toggleEdit" data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Scroll.Edit'}}">
-          <i class="fa-solid fa-feather-pointed"></i>
+          {{#if illuminated}}{{grIcon "ui-act_edit"}}{{else}}<i class="fa-solid fa-feather-pointed"></i>{{/if}}
         </button>
       {{/if}}
     </div>
@@ -37,6 +38,7 @@
 
   <div class="scroll-body">
     {{#if details}}
+      {{#if illuminated}}<div class="gr-page-sigil">{{grIcon details.glyph}}</div>{{/if}}
       <div class="scroll-lore">{{details.subtitle}}</div>
       <h2 class="scroll-name">{{details.name}}</h2>
       {{#if hidden}}
@@ -56,14 +58,21 @@
 
   {{#if details}}
     <footer class="scroll-foot">
+      {{#if illuminated}}
+        <div class="gr-scroll-seal" data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Scroll.CountTooltip'}}">
+          {{grIcon "orn-wax_seal" "gr-scroll-wax"}}
+          <span class="gr-scroll-seal-sigil">{{grIcon details.glyph}}</span>
+          <b class="gr-scroll-seal-count">×{{count}}</b>
+        </div>
+      {{/if}}
       {{#if details.note}}<p class="grimoire-note">{{details.note}}</p>{{/if}}
       <div class="grimoire-actions">
         {{#each details.actions}}
-          <button type="button" {{#if primary}}class="primary"{{/if}} data-action="entryAction" data-entry-action="{{id}}"><i class="fa-solid {{icon}}"></i> {{label}}</button>
+          <button type="button" {{#if primary}}class="primary"{{/if}} data-action="entryAction" data-entry-action="{{id}}">{{#if (and ../illuminated glyph)}}{{grIcon glyph}}{{else}}<i class="fa-solid {{icon}}"></i>{{/if}} {{label}}</button>
         {{/each}}
       </div>
     </footer>
   {{/if}}
 
-  <div class="scroll-rod bottom"></div>
+  <div class="scroll-rod bottom">{{#if illuminated}}<span class="gr-finial left">{{grIcon "orn-scroll_finial"}}</span><span class="gr-finial right">{{grIcon "orn-scroll_finial"}}</span>{{/if}}</div>
 </div>

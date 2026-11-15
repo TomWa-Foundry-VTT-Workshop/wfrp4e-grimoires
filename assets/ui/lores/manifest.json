@@ -1,0 +1,102 @@
+[
+  {
+    "id": "petty",
+    "file": "petty.svg",
+    "subject": "Spark above a short candle"
+  },
+  {
+    "id": "arcane",
+    "file": "arcane.svg",
+    "subject": "Ornate old key, bit down"
+  },
+  {
+    "id": "beasts",
+    "file": "beasts.svg",
+    "subject": "Stag antlers rising from a brow plate"
+  },
+  {
+    "id": "death",
+    "file": "death.svg",
+    "subject": "Hourglass with the sand mostly run down"
+  },
+  {
+    "id": "fire",
+    "file": "fire.svg",
+    "subject": "Three-tongued flame over a brazier bowl"
+  },
+  {
+    "id": "heavens",
+    "file": "heavens.svg",
+    "subject": "Crescent moon cradling three small stars"
+  },
+  {
+    "id": "metal",
+    "file": "metal.svg",
+    "subject": "Smith's hammer resting on an anvil"
+  },
+  {
+    "id": "life",
+    "file": "life.svg",
+    "subject": "Sprouting seedling with two leaves and roots"
+  },
+  {
+    "id": "light",
+    "file": "light.svg",
+    "subject": "Sun disc with alternating straight and wavy rays"
+  },
+  {
+    "id": "shadow",
+    "file": "shadow.svg",
+    "subject": "Half mask with a veil falling from it"
+  },
+  {
+    "id": "hedgecraft",
+    "file": "hedgecraft.svg",
+    "subject": "crescent sickle with a mistletoe sprig inside the curve of the blade"
+  },
+  {
+    "id": "witchcraft",
+    "file": "witchcraft.svg",
+    "subject": "Three-legged cauldron with rising steam"
+  },
+  {
+    "id": "daemonology",
+    "file": "daemonology.svg",
+    "subject": "summoning ring with a gap at the bottom, inward tines and an open shackle hanging inside"
+  },
+  {
+    "id": "necromancy",
+    "file": "necromancy.svg",
+    "subject": "skull above two crossed long bones"
+  },
+  {
+    "id": "nurgle",
+    "file": "nurgle.svg",
+    "subject": "cracked bloated clay jar with a tied lid, dripping (decay; no flies, no three circles)"
+  },
+  {
+    "id": "slaanesh",
+    "file": "slaanesh.svg",
+    "subject": "Ornate hand mirror with a cracked glass"
+  },
+  {
+    "id": "tzeentch",
+    "file": "tzeentch.svg",
+    "subject": "Spiral that splits into two forks"
+  },
+  {
+    "id": "undivided",
+    "file": "undivided.svg",
+    "subject": "sphere split into two halves drifting apart, jagged broken edges and small fragments in the gap"
+  },
+  {
+    "id": "ritual",
+    "file": "ritual.svg",
+    "subject": "Ritual circle: two rings, marks on the outer ring, centre dot"
+  },
+  {
+    "id": "recipe",
+    "file": "recipe.svg",
+    "subject": "Alchemist's retort with a curved spout and bubbles"
+  }
+]

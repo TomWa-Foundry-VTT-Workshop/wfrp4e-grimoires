@@ -1,4 +1,12 @@
-<div class="grimoire" style="--grimoire-cover: {{cover}}">
+<div class="grimoire {{#if lightCover}}is-light-cover{{/if}}" style="--grimoire-cover: {{cover}}">
+  {{#if illuminated}}
+    {{!-- Okucia narożne i klamra oprawy (tylko wygląd iluminowany) --}}
+    <span class="gr-cover-corner tl">{{grIcon "orn-cover_corner"}}</span>
+    <span class="gr-cover-corner tr">{{grIcon "orn-cover_corner"}}</span>
+    <span class="gr-cover-corner bl">{{grIcon "orn-cover_corner"}}</span>
+    <span class="gr-cover-corner br">{{grIcon "orn-cover_corner"}}</span>
+    <span class="gr-cover-clasp">{{grIcon "orn-cover_clasp"}}</span>
+  {{/if}}
   <header class="grimoire-cover-bar">
     <div class="grimoire-title">
       <i class="fa-solid fa-book-journal-whills"></i>
@@ -8,19 +16,21 @@
     <div class="grimoire-badges">
       {{#each badges}}
         <span class="grimoire-badge {{#if ok}}ok{{else}}missing{{/if}}">
+          {{#if (and ../illuminated glyph)}}{{grIcon glyph}}{{/if}}
           <i class="fa-solid {{#if ok}}fa-check{{else}}fa-xmark{{/if}}"></i> {{label}}
         </span>
       {{/each}}
+      {{#if slotsLabel}}<span class="grimoire-badge ok"><i class="fa-solid fa-bookmark"></i> {{slotsLabel}}</span>{{/if}}
       {{#if pagesLabel}}<span class="grimoire-badge ok"><i class="fa-solid fa-file-lines"></i> {{pagesLabel}}</span>{{/if}}
       {{#if showCarried}}
         <span class="grimoire-badge {{#if carried}}ok{{else}}missing{{/if}}">
           <i class="fa-solid fa-hand-holding"></i>
-          {{#if carried}}{{localize "WFRP4E_GRIMOIRE.Badge.carried"}}{{else}}{{localize "WFRP4E_GRIMOIRE.Badge.notCarried"}}{{/if}}
+          {{#if carried}}{{localize "WFRP4E_GRIMOIRE.Badge.carried"}}{{else}}{{localize "WFRP4E_GRIMOIRE.Badge.notCarried"}}{{/if}}{{#if handsLabel}} · {{handsLabel}}{{/if}}
         </span>
       {{/if}}
       {{#if canEdit}}
         <button type="button" class="grimoire-edit-toggle {{#if editMode}}active{{/if}}" data-action="toggleEdit" data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Edit.Toggle'}}">
-          <i class="fa-solid fa-feather-pointed"></i>
+          {{#if illuminated}}{{grIcon "ui-act_edit"}}{{else}}<i class="fa-solid fa-feather-pointed"></i>{{/if}}
         </button>
       {{/if}}
     </div>
@@ -28,6 +38,7 @@
 
   {{#if editMode}}
     <section class="grimoire-editbar">
+      {{#if illuminated}}<span class="gr-desk-ink" aria-hidden="true">{{grIcon "orn-quill_inkpot"}}</span>{{/if}}
       <label>{{localize "WFRP4E_GRIMOIRE.Edit.Language"}}
         <select name="language">
           {{#each languages}}<option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
@@ -47,6 +58,14 @@
           {{/each}}
         </div>
         <div class="grimoire-rules">
+          <label data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Edit.SlotsHint'}}">{{localize "WFRP4E_GRIMOIRE.Edit.Slots"}}
+            <input type="number" name="slots" min="1" value="{{rules.slots}}" placeholder="∞">
+          </label>
+          <label data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Edit.HandsHint'}}">{{localize "WFRP4E_GRIMOIRE.Edit.Hands"}}
+            <select name="hands">
+              {{#each rules.hands}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+            </select>
+          </label>
           <label>{{localize "WFRP4E_GRIMOIRE.Edit.Pages"}}
             <input type="number" name="pages" min="1" value="{{rules.pages}}" placeholder="∞">
           </label>
@@ -76,6 +95,9 @@
     </section>
   {{/if}}
 
+  {{#if illuminated}}
+  {{> "modules/wfrp4e-grimoires/templates/parts/book-illuminated.hbs"}}
+  {{else}}
   <div class="grimoire-spread">
     <section class="grimoire-page left">
       <div class="grimoire-search">
@@ -143,4 +165,5 @@
       {{/if}}
     </section>
   </div>
+  {{/if}}
 </div>

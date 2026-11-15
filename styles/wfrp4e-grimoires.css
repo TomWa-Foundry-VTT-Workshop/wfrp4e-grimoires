@@ -1,5 +1,8 @@
 /* WFRP4e – Grimoires: okno księgi zaklęć */
 
+/* Wygląd „Iluminowana Księga” w osobnym pliku (musi stać przed pozostałymi regułami) */
+@import url("illuminated.css");
+
 .wfrp4e-grimoires.grimoire-window {
   --grimoire-paper: #f3e6c4;
   --grimoire-paper-dark: #e6d3a3;

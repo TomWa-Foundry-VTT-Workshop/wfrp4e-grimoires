@@ -6,6 +6,7 @@
  */
 import { MODULE_ID } from "./constants.mjs";
 import { setRequirementDefaults } from "./grimoire-data.mjs";
+import { STYLE_CLASSIC, STYLE_ILLUMINATED } from "./ui.mjs";
 
 const HIDDEN = {
   requireCarried: { type: Boolean, default: true },
@@ -20,6 +21,20 @@ const VISIBLE = {
 };
 
 export function registerSettings() {
+  // Wygląd okien jest wyborem każdego gracza
+  game.settings.register(MODULE_ID, "bookStyle", {
+    name: "WFRP4E_GRIMOIRE.Settings.BookStyleName",
+    hint: "WFRP4E_GRIMOIRE.Settings.BookStyleHint",
+    scope: "client",
+    config: true,
+    type: String,
+    choices: {
+      [STYLE_ILLUMINATED]: "WFRP4E_GRIMOIRE.Settings.BookStyle.illuminated",
+      [STYLE_CLASSIC]: "WFRP4E_GRIMOIRE.Settings.BookStyle.classic"
+    },
+    default: STYLE_ILLUMINATED,
+    onChange: () => Hooks.callAll(`${MODULE_ID}.settingsChanged`)
+  });
   for (const [key, { type, default: value }] of Object.entries(HIDDEN)) {
     game.settings.register(MODULE_ID, key, { scope: "world", config: false, type, default: value });
   }

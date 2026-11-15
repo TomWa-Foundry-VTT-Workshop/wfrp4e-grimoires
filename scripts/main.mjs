@@ -15,6 +15,8 @@ import { isBook, isGrimoire, isScroll, readBook } from "./grimoire-data.mjs";
 import { getEntryType, registerEntryType } from "./entry-types.mjs";
 import { spellType } from "./spell-type.mjs";
 import { addAliases } from "./names.mjs";
+import { iconMarkup, registerUiHelpers, useIlluminated } from "./ui.mjs";
+import { registerHands } from "./hands.mjs";
 
 registerEntryType(spellType);
 
@@ -27,13 +29,16 @@ Hooks.once("i18nInit", () => {
 Hooks.once("init", () => {
   log.info("init");
   registerSettings();
+  registerUiHelpers();
   registerMemorizeQuery();
   registerInventory();
+  registerHands();
   registerCopyHooks();
   foundry.applications.handlebars.loadTemplates([
     `modules/${MODULE_ID}/templates/grimoire.hbs`,
     `modules/${MODULE_ID}/templates/chat-spell.hbs`,
-    `modules/${MODULE_ID}/templates/scroll.hbs`
+    `modules/${MODULE_ID}/templates/scroll.hbs`,
+    `modules/${MODULE_ID}/templates/parts/book-illuminated.hbs`
   ]);
 
   game.modules.get(MODULE_ID).api = {
@@ -67,6 +72,17 @@ Hooks.once("init", () => {
 
 Hooks.once("setup", applyRequirementDefaults);
 
+// Karty czatu w wyglądzie iluminowanym zależą od ustawienia oglądającego
+const syncChatStyle = () => document.body.classList.toggle("gr-illuminated-chat", useIlluminated());
+Hooks.once("ready", syncChatStyle);
+
+// Sanitizer wiadomości wycina <svg>, więc karta niesie tylko data-gr-glyph, a ikonę dokładamy przy renderze
+Hooks.on("renderChatMessageHTML", (_message, html) => {
+  for (const el of html.querySelectorAll?.(".wfrp4e-grimoires-chat [data-gr-glyph]") ?? []) {
+    if (el.dataset.grGlyph && !el.querySelector("svg")) el.insertAdjacentHTML("afterbegin", iconMarkup(el.dataset.grGlyph));
+  }
+});
+
 // Odświeżanie otwartych okien po zmianach księgi lub postaci
 Hooks.on("updateItem", (item) => {
   if (isGrimoire(item)) GrimoireApp.refresh(item);
@@ -93,5 +109,6 @@ Hooks.on("updateActor", (actor) => {
   ScrollApp.refreshForActor(actor);
 });
 Hooks.on(`${MODULE_ID}.settingsChanged`, () => {
+  syncChatStyle();
   for (const app of foundry.applications.instances.values()) if (app instanceof GrimoireApp || app instanceof ScrollApp) app.render();
 });

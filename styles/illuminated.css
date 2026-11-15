@@ -1,0 +1,831 @@
+/* WFRP4e – Grimoires: wygląd „Iluminowana Księga” (klasa okna .gr-illuminated, ustawienie klienta „Wygląd ksiąg”).
+   Czcionki i pergamin pochodzą z systemu WFRP4e, ozdoby z assets/ui (sprite i pojedyncze pliki jako maski). */
+
+@font-face { font-family: "GR Nodesto"; src: url("../../../systems/wfrp4e/fonts/NodestoCapsCondensed.otf") format("opentype"); font-display: swap; }
+@font-face { font-family: "GR Caslon Antique"; src: url("../../../systems/wfrp4e/fonts/CaslonAntique.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "GR Caslon Antique"; font-weight: bold; src: url("../../../systems/wfrp4e/fonts/CaslonAntique-Bold.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "GR Caslon"; src: url("../../../systems/wfrp4e/fonts/ACaslonPro-Regular.otf") format("opentype"); font-display: swap; }
+@font-face { font-family: "GR Caslon"; font-style: italic; src: url("../../../systems/wfrp4e/fonts/ACaslonPro-Italic.otf") format("opentype"); font-display: swap; }
+@font-face { font-family: "GR Caslon"; font-weight: 600; src: url("../../../systems/wfrp4e/fonts/ACaslonPro-Semibold.otf") format("opentype"); font-display: swap; }
+
+/* ─── Paleta ─── */
+.wfrp4e-grimoires.gr-illuminated {
+  --gr-paper: #f1e4c3;
+  --gr-paper-deep: #e2cf9f;
+  --gr-ink: #2a1d12;
+  --gr-ink-soft: #5c4530;
+  --gr-brass: #c9a24b;
+  --gr-brass-deep: #7d5e1f;
+  --gr-display: "GR Nodesto", "Nodesto Caps Condensed", var(--font-header, serif);
+  --gr-title: "GR Caslon Antique", "Caslon Antique", serif;
+  --gr-body: "GR Caslon", "Adobe Caslon Pro", var(--font-body, serif);
+  --gr-parchment: url("../../../systems/wfrp4e/ui/backgrounds/parchment-texture.webp");
+  --grimoire-paper: var(--gr-paper);
+  --grimoire-paper-dark: var(--gr-paper-deep);
+  --grimoire-ink: var(--gr-ink);
+  --grimoire-ink-soft: var(--gr-ink-soft);
+  --lore-ink: #2a3550;
+  --lore-wash: rgba(42, 53, 80, 0.08);
+}
+
+/* ─── Motywy szkół: atrament rubryk (kontrast z pergaminem co najmniej 4.5:1) ─── */
+.wfrp4e-grimoires.gr-illuminated [data-lore="petty"], .wfrp4e-grimoires.gr-illuminated[data-lore="petty"], .wfrp4e-grimoires-chat[data-lore="petty"] { --lore-ink: #5a4127; --lore-wash: rgba(90, 65, 39, 0.08); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="arcane"], .wfrp4e-grimoires.gr-illuminated[data-lore="arcane"], .wfrp4e-grimoires-chat[data-lore="arcane"] { --lore-ink: #2a3550; --lore-wash: rgba(42, 53, 80, 0.08); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="beasts"], .wfrp4e-grimoires.gr-illuminated[data-lore="beasts"], .wfrp4e-grimoires-chat[data-lore="beasts"] { --lore-ink: #7a440c; --lore-wash: rgba(154, 91, 19, 0.1); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="death"], .wfrp4e-grimoires.gr-illuminated[data-lore="death"], .wfrp4e-grimoires-chat[data-lore="death"] { --lore-ink: #57286a; --lore-wash: rgba(87, 40, 106, 0.08); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="fire"], .wfrp4e-grimoires.gr-illuminated[data-lore="fire"], .wfrp4e-grimoires-chat[data-lore="fire"] { --lore-ink: #9c2a0c; --lore-wash: rgba(176, 48, 15, 0.08); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="heavens"], .wfrp4e-grimoires.gr-illuminated[data-lore="heavens"], .wfrp4e-grimoires-chat[data-lore="heavens"] { --lore-ink: #1d4a83; --lore-wash: rgba(31, 78, 138, 0.08); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="metal"], .wfrp4e-grimoires.gr-illuminated[data-lore="metal"], .wfrp4e-grimoires-chat[data-lore="metal"] { --lore-ink: #6a5112; --lore-wash: rgba(160, 122, 28, 0.1); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="life"], .wfrp4e-grimoires.gr-illuminated[data-lore="life"], .wfrp4e-grimoires-chat[data-lore="life"] { --lore-ink: #2b632b; --lore-wash: rgba(46, 107, 46, 0.08); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="light"], .wfrp4e-grimoires.gr-illuminated[data-lore="light"], .wfrp4e-grimoires-chat[data-lore="light"] { --lore-ink: #6a510c; --lore-wash: rgba(201, 162, 39, 0.12); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="shadow"], .wfrp4e-grimoires.gr-illuminated[data-lore="shadow"], .wfrp4e-grimoires-chat[data-lore="shadow"] { --lore-ink: #464b53; --lore-wash: rgba(74, 79, 87, 0.08); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="hedgecraft"], .wfrp4e-grimoires.gr-illuminated[data-lore="hedgecraft"], .wfrp4e-grimoires-chat[data-lore="hedgecraft"] { --lore-ink: #4b5a1c; --lore-wash: rgba(91, 106, 42, 0.1); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="witchcraft"], .wfrp4e-grimoires.gr-illuminated[data-lore="witchcraft"], .wfrp4e-grimoires-chat[data-lore="witchcraft"] { --lore-ink: #6b1f3a; --lore-wash: rgba(107, 31, 58, 0.08); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="daemonology"], .wfrp4e-grimoires.gr-illuminated[data-lore="daemonology"], .wfrp4e-grimoires-chat[data-lore="daemonology"] { --lore-ink: #7a0f0f; --lore-wash: rgba(122, 15, 15, 0.08); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="necromancy"], .wfrp4e-grimoires.gr-illuminated[data-lore="necromancy"], .wfrp4e-grimoires-chat[data-lore="necromancy"] { --lore-ink: #4a5530; --lore-wash: rgba(111, 125, 74, 0.12); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="nurgle"], .wfrp4e-grimoires.gr-illuminated[data-lore="nurgle"], .wfrp4e-grimoires-chat[data-lore="nurgle"] { --lore-ink: #4b5612; --lore-wash: rgba(93, 107, 31, 0.1); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="slaanesh"], .wfrp4e-grimoires.gr-illuminated[data-lore="slaanesh"], .wfrp4e-grimoires-chat[data-lore="slaanesh"] { --lore-ink: #7a2862; --lore-wash: rgba(138, 47, 111, 0.08); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="tzeentch"], .wfrp4e-grimoires.gr-illuminated[data-lore="tzeentch"], .wfrp4e-grimoires-chat[data-lore="tzeentch"] { --lore-ink: #1b5c70; --lore-wash: rgba(31, 111, 138, 0.08); }
+.wfrp4e-grimoires.gr-illuminated [data-lore="undivided"], .wfrp4e-grimoires.gr-illuminated[data-lore="undivided"], .wfrp4e-grimoires-chat[data-lore="undivided"] { --lore-ink: #6b2f1f; --lore-wash: rgba(107, 47, 31, 0.08); }
+
+/* ─── Ikony ze sprite'a ─── */
+.wfrp4e-grimoires.gr-illuminated .gr-icon { width: 1.15em; height: 1.15em; fill: currentColor; vertical-align: -0.2em; flex: 0 0 auto; }
+
+/* ─── Oprawa ─── */
+.wfrp4e-grimoires.gr-illuminated .grimoire {
+  position: relative;
+  padding: 16px 20px 18px;
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(255, 255, 255, 0.08), transparent 70%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.35)),
+    var(--grimoire-cover);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.35), inset 0 0 24px rgba(0, 0, 0, 0.55);
+  isolation: isolate;
+}
+/* Ślepe tłoczenie skóry */
+.wfrp4e-grimoires.gr-illuminated .grimoire::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: rgba(255, 228, 170, 0.14);
+  -webkit-mask: url("../assets/ui/ornaments/cover_tooling.svg") repeat 0 0 / 64px 64px;
+  mask: url("../assets/ui/ornaments/cover_tooling.svg") repeat 0 0 / 64px 64px;
+  pointer-events: none;
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire > * { position: relative; z-index: 1; }
+
+.wfrp4e-grimoires.gr-illuminated .gr-cover-corner {
+  position: absolute;
+  z-index: 3;
+  width: 58px;
+  height: 58px;
+  color: var(--gr-brass);
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.6));
+  pointer-events: none;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-cover-corner .gr-icon { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated .gr-cover-corner.tl { left: 2px; top: 2px; }
+.wfrp4e-grimoires.gr-illuminated .gr-cover-corner.tr { right: 2px; top: 2px; transform: scaleX(-1); }
+.wfrp4e-grimoires.gr-illuminated .gr-cover-corner.bl { left: 2px; bottom: 2px; transform: scaleY(-1); }
+.wfrp4e-grimoires.gr-illuminated .gr-cover-corner.br { right: 2px; bottom: 2px; transform: scale(-1, -1); }
+.wfrp4e-grimoires.gr-illuminated .gr-cover-clasp {
+  position: absolute;
+  z-index: 3;
+  right: -3px;
+  top: 50%;
+  width: 26px;
+  height: 52px;
+  transform: translateY(-50%);
+  color: var(--gr-brass);
+  filter: drop-shadow(-1px 2px 2px rgba(0, 0, 0, 0.6));
+  pointer-events: none;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-cover-clasp .gr-icon { width: 100%; height: 100%; vertical-align: top; }
+
+/* Pasek okładki: tytuł wytłoczony złotem i znaki warunków */
+.wfrp4e-grimoires.gr-illuminated .grimoire-cover-bar { padding: 0 44px; color: #f3e2b4; }
+.wfrp4e-grimoires.gr-illuminated .grimoire-title { font-family: var(--gr-display); font-size: 1.15rem; letter-spacing: 0.04em; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-title { flex: 1 1 auto; min-width: 0; white-space: nowrap; }
+.wfrp4e-grimoires.gr-illuminated .grimoire-title > span { overflow: hidden; text-overflow: ellipsis; }
+.wfrp4e-grimoires.gr-illuminated .grimoire-badges { flex: 0 1 auto; justify-content: flex-end; }
+.wfrp4e-grimoires.gr-illuminated .grimoire-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: var(--gr-paper) var(--gr-parchment);
+  border: 1px solid var(--gr-brass-deep);
+  font-family: var(--gr-body);
+  font-size: 0.78rem;
+  color: #2f5d1e;
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-badge.missing { color: #8a1f1f; }
+.wfrp4e-grimoires.gr-illuminated .grimoire-badge .gr-icon { color: var(--gr-ink); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-edit-toggle {
+  display: inline-grid;
+  place-items: center;
+  color: #f3e2b4;
+  border-color: var(--gr-brass);
+  border-radius: 50%;
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-edit-toggle.active { background: var(--gr-brass-deep); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-editbar { background: var(--gr-paper) var(--gr-parchment); border: 1px solid var(--gr-brass-deep); font-family: var(--gr-body); }
+
+/* ─── Rozkładówka ─── */
+.wfrp4e-grimoires.gr-illuminated .gr-spread {
+  position: relative;
+  border-radius: 3px;
+  background: var(--gr-paper) var(--gr-parchment);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.35);
+  overflow: visible;
+}
+/* Postrzępione brzegi kart u góry i u dołu */
+.wfrp4e-grimoires.gr-illuminated .gr-spread::before,
+.wfrp4e-grimoires.gr-illuminated .gr-spread::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  height: 7px;
+  background-color: var(--grimoire-cover);
+  -webkit-mask: url("../assets/ui/ornaments/deckle_edge.svg") repeat-x 0 0 / 260px 7px;
+  mask: url("../assets/ui/ornaments/deckle_edge.svg") repeat-x 0 0 / 260px 7px;
+  pointer-events: none;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-spread::before { top: -1px; transform: scaleY(-1); }
+.wfrp4e-grimoires.gr-illuminated .gr-spread::after { bottom: -1px; }
+
+.wfrp4e-grimoires.gr-illuminated .grimoire-page {
+  position: relative;
+  color: var(--gr-ink);
+  font-family: var(--gr-body);
+  font-size: 0.98rem;
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-page.left {
+  padding: 20px 18px 16px 40px;
+  background: linear-gradient(90deg, transparent 80%, rgba(90, 60, 25, 0.22));
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-page.right {
+  padding: 18px 26px 14px 18px;
+  background: linear-gradient(270deg, transparent 80%, rgba(90, 60, 25, 0.22));
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-spine {
+  background: linear-gradient(90deg, rgba(60, 35, 15, 0.42), rgba(60, 35, 15, 0.12) 45%, rgba(60, 35, 15, 0.12) 55%, rgba(60, 35, 15, 0.42));
+}
+
+/* Narożniki ramki lewej strony i marginalia szkoły na prawej */
+.wfrp4e-grimoires.gr-illuminated .gr-frame-corner {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  color: var(--gr-ink-soft);
+  opacity: 0.7;
+  pointer-events: none;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-frame-corner .gr-icon { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated .gr-frame-corner.tl { left: 4px; top: 6px; }
+.wfrp4e-grimoires.gr-illuminated .gr-frame-corner.bl { left: 4px; bottom: 6px; transform: scaleY(-1); }
+
+.wfrp4e-grimoires.gr-illuminated .gr-marg {
+  position: absolute;
+  top: 8px;
+  z-index: 0;
+  width: 104px;
+  height: 104px;
+  color: var(--lore-ink);
+  opacity: 0.8;
+  pointer-events: none;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-marg .gr-icon { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated .gr-marg.tl { left: 6px; }
+.wfrp4e-grimoires.gr-illuminated .gr-marg.tr { right: 10px; transform: scaleX(-1); }
+
+/* ─── Spis treści ─── */
+.wfrp4e-grimoires.gr-illuminated .grimoire-search { position: relative; z-index: 1; color: var(--gr-ink-soft); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-search input {
+  background: rgba(255, 250, 235, 0.45);
+  border: none;
+  border-bottom: 1px solid var(--gr-ink-soft);
+  border-radius: 0;
+  font-family: var(--gr-body);
+  color: var(--gr-ink);
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-toc-list { position: relative; z-index: 1; }
+.wfrp4e-grimoires.gr-illuminated .grimoire-type-heading { font-family: var(--gr-display); letter-spacing: 0.05em; color: var(--gr-ink-soft); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-lore {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--lore-ink);
+  font-family: var(--gr-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid color-mix(in srgb, var(--lore-ink) 45%, transparent);
+}
+.wfrp4e-grimoires.gr-illuminated .gr-lore-glyph { width: 1.4em; height: 1.4em; }
+.wfrp4e-grimoires.gr-illuminated .grimoire-entry {
+  border-left: 3px solid transparent;
+  border-radius: 0 3px 3px 0;
+  font-family: var(--gr-title);
+  font-size: 1.02rem;
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-entry:hover { background: var(--lore-wash); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-entry.selected {
+  background: var(--lore-wash);
+  border-left-color: var(--lore-ink);
+  color: var(--gr-ink);
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-entry .gr-status { display: inline-flex; color: var(--lore-ink); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-entry .grimoire-flawed { color: #8a1f1f; }
+.wfrp4e-grimoires.gr-illuminated .grimoire-entry-cn { font-family: var(--gr-display); color: var(--lore-ink); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-empty { font-family: var(--gr-body); font-style: italic; color: var(--gr-ink-soft); }
+
+/* ─── Strona wpisu ─── */
+.wfrp4e-grimoires.gr-illuminated .grimoire-details { position: relative; z-index: 1; padding: 0 22px; }
+.wfrp4e-grimoires.gr-illuminated .gr-page-sigil {
+  display: flex;
+  justify-content: center;
+  margin: 2px 0 4px;
+  color: var(--lore-ink);
+}
+.wfrp4e-grimoires.gr-illuminated .gr-page-sigil .gr-icon { width: 40px; height: 40px; }
+.wfrp4e-grimoires.gr-illuminated .grimoire-details-lore {
+  text-align: center;
+  font-family: var(--gr-display);
+  letter-spacing: 0.08em;
+  color: var(--lore-ink);
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-details-name {
+  margin: 0;
+  text-align: center;
+  font-family: var(--gr-title);
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: var(--gr-ink);
+  border-bottom: none;
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-stats div {
+  background: rgba(255, 250, 235, 0.4);
+  border: 1px solid color-mix(in srgb, var(--lore-ink) 35%, transparent);
+  border-top: 3px solid var(--lore-ink);
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-stats span { font-family: var(--gr-display); letter-spacing: 0.05em; color: var(--lore-ink); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-stats b { font-family: var(--gr-body); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-description { font-family: var(--gr-body); line-height: 1.45; }
+.wfrp4e-grimoires.gr-illuminated .grimoire-note { font-family: var(--gr-body); font-style: italic; }
+
+/* Przyciski akcji jak lakowe pieczęcie */
+.wfrp4e-grimoires.gr-illuminated .grimoire-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-family: var(--gr-display);
+  letter-spacing: 0.04em;
+  color: var(--lore-ink);
+  background: rgba(255, 250, 235, 0.55);
+  border: 1px solid var(--lore-ink);
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-actions button:hover { background: var(--lore-wash); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-actions button.primary {
+  color: #f6ead0;
+  background: var(--lore-ink);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.18), 0 2px 3px rgba(0, 0, 0, 0.35);
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-actions button.primary:hover { filter: brightness(1.12); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-actions button:focus-visible { outline: 2px solid var(--gr-brass); outline-offset: 2px; }
+
+.wfrp4e-grimoires.gr-illuminated .grimoire-blank { color: var(--gr-ink-soft); }
+.wfrp4e-grimoires.gr-illuminated .gr-blank-vignette { width: 55%; height: auto; aspect-ratio: 4 / 3; opacity: 0.45; }
+
+/* ─── Zwój ─── */
+.wfrp4e-grimoires.gr-illuminated .scroll-parchment { background: var(--gr-paper) var(--gr-parchment); font-family: var(--gr-body); }
+.wfrp4e-grimoires.gr-illuminated .scroll-rod { position: relative; }
+.wfrp4e-grimoires.gr-illuminated .gr-finial {
+  position: absolute;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  color: #2b1708;
+  transform: translateY(-50%);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+}
+.wfrp4e-grimoires.gr-illuminated .gr-finial .gr-icon { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated .gr-finial.left { left: 0; transform: translateY(-50%) scaleX(-1); }
+.wfrp4e-grimoires.gr-illuminated .gr-finial.right { right: 0; }
+.wfrp4e-grimoires.gr-illuminated .scroll-meta { font-family: var(--gr-display); letter-spacing: 0.04em; }
+.wfrp4e-grimoires.gr-illuminated .scroll-lore { text-align: center; font-family: var(--gr-display); letter-spacing: 0.08em; color: var(--lore-ink); }
+.wfrp4e-grimoires.gr-illuminated .scroll-name { text-align: center; font-family: var(--gr-title); font-weight: bold; color: var(--gr-ink); }
+
+/* ─── Rozkładówki: spis treści i strony wpisów ─── */
+.wfrp4e-grimoires.gr-illuminated .grimoire { padding-bottom: 48px; }
+.wfrp4e-grimoires.gr-illuminated .gr-spread {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px minmax(0, 1fr);
+  outline: none;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-spread:focus-visible { box-shadow: 0 6px 14px rgba(0, 0, 0, 0.55), 0 0 0 2px var(--gr-brass); }
+.wfrp4e-grimoires.gr-illuminated .gr-spread .grimoire-page { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+
+.wfrp4e-grimoires.gr-illuminated .gr-page-foot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  margin-top: auto;
+  padding-top: 4px;
+  font-family: var(--gr-display);
+  letter-spacing: 0.05em;
+  color: var(--gr-ink-soft);
+}
+.wfrp4e-grimoires.gr-illuminated .gr-turn {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--lore-ink);
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-turn .gr-icon { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated .gr-turn:hover:not(:disabled) { transform: scale(1.1); }
+.wfrp4e-grimoires.gr-illuminated .gr-turn:disabled { opacity: 0.25; cursor: default; }
+.wfrp4e-grimoires.gr-illuminated .gr-turn:focus-visible { outline: 2px solid var(--gr-brass); outline-offset: 2px; }
+.wfrp4e-grimoires.gr-illuminated .gr-turn.next { margin-left: auto; }
+.wfrp4e-grimoires.gr-illuminated .gr-sheet-counter { font-size: 0.85rem; }
+
+/* Karta tytułowa (ex libris) */
+.wfrp4e-grimoires.gr-illuminated .gr-exlibris {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-exlibris-mark .gr-icon { width: 54px; height: 54px; color: var(--gr-brass-deep); }
+.wfrp4e-grimoires.gr-illuminated .gr-exlibris-title { margin: 0; border: none; font-family: var(--gr-title); font-size: 1.9rem; font-weight: bold; line-height: 1.15; color: var(--gr-ink); }
+.wfrp4e-grimoires.gr-illuminated .gr-exlibris-line { margin: 0; font-family: var(--gr-body); }
+.wfrp4e-grimoires.gr-illuminated .gr-rule { display: flex; justify-content: center; width: 100%; color: var(--lore-ink); }
+.wfrp4e-grimoires.gr-illuminated .gr-rule .gr-icon { width: min(240px, 90%); height: 12px; }
+.wfrp4e-grimoires.gr-illuminated .gr-capacity { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; margin-top: 6px; font-family: var(--gr-display); letter-spacing: 0.04em; }
+.wfrp4e-grimoires.gr-illuminated .gr-tailpiece { margin-top: 10px; color: var(--gr-ink-soft); opacity: 0.7; }
+.wfrp4e-grimoires.gr-illuminated .gr-tailpiece .gr-icon { width: 170px; height: 42px; }
+
+/* Spis treści z kropkowanymi prowadnicami i numerami kart */
+.wfrp4e-grimoires.gr-illuminated .gr-contents-title { margin: 0 0 6px; border: none; text-align: center; font-family: var(--gr-display); font-size: 1.35rem; letter-spacing: 0.12em; color: var(--gr-ink); }
+.wfrp4e-grimoires.gr-illuminated .gr-contents-page .grimoire-toc-list { flex: 1; min-height: 0; overflow-y: auto; }
+.wfrp4e-grimoires.gr-illuminated .gr-contents-page .grimoire-entry { gap: 4px; }
+.wfrp4e-grimoires.gr-illuminated .gr-contents-page .grimoire-entry-name { flex: 0 1 auto; }
+.wfrp4e-grimoires.gr-illuminated .gr-dots { flex: 1 1 20px; align-self: flex-end; margin-bottom: 0.45em; border-bottom: 2px dotted color-mix(in srgb, var(--gr-ink-soft) 60%, transparent); }
+.wfrp4e-grimoires.gr-illuminated .gr-entry-folio { min-width: 2.6em; text-align: right; font-family: var(--gr-display); color: var(--gr-ink-soft); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-entry:focus-visible { outline: 2px solid var(--gr-brass); outline-offset: 1px; }
+.wfrp4e-grimoires.gr-illuminated .grimoire-entry-edit a { color: var(--gr-ink-soft); }
+.wfrp4e-grimoires.gr-illuminated .gr-empty-slot {
+  margin: 2px 0;
+  padding: 5px 8px;
+  text-align: center;
+  font-family: var(--gr-body);
+  font-style: italic;
+  color: var(--gr-ink-soft);
+  border-bottom: 1px dashed color-mix(in srgb, var(--gr-ink-soft) 50%, transparent);
+}
+
+/* Karta iluminowana wpisu */
+.wfrp4e-grimoires.gr-illuminated .gr-entry-head {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 0 10px;
+  text-align: center;
+}
+.wfrp4e-grimoires.gr-illuminated :is(.gr-entry-head, .grimoire-toc-list) { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--lore-ink) 45%, transparent) transparent; }
+.wfrp4e-grimoires.gr-illuminated .gr-ritual-mark { margin: 0; font-style: italic; color: var(--lore-ink); }
+.wfrp4e-grimoires.gr-illuminated .gr-medallion { position: relative; flex: 0 0 auto; width: 64px; height: 64px; margin-top: 2px; color: var(--lore-ink); }
+.wfrp4e-grimoires.gr-illuminated .gr-medallion-art { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated .gr-medallion-value { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--gr-display); font-size: 1.55rem; color: var(--gr-ink); }
+.wfrp4e-grimoires.gr-illuminated .gr-medallion-label { font-family: var(--gr-display); font-size: 0.85rem; letter-spacing: 0.06em; color: var(--lore-ink); }
+.wfrp4e-grimoires.gr-illuminated .gr-side-stats { display: grid; gap: 4px; width: 100%; margin: 8px 0 4px; }
+.wfrp4e-grimoires.gr-illuminated .gr-side-stats > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  padding-bottom: 3px;
+  text-align: left;
+  border-bottom: 1px solid color-mix(in srgb, var(--lore-ink) 25%, transparent);
+}
+.wfrp4e-grimoires.gr-illuminated .gr-side-stats dt { font-family: var(--gr-display); letter-spacing: 0.04em; color: var(--lore-ink); white-space: nowrap; }
+.wfrp4e-grimoires.gr-illuminated .gr-side-stats dd { margin: 0; font-family: var(--gr-body); color: var(--gr-ink); }
+.wfrp4e-grimoires.gr-illuminated .gr-entry-head .grimoire-note { margin-top: 4px; }
+.wfrp4e-grimoires.gr-illuminated .gr-entry-head .grimoire-note .gr-icon { color: var(--lore-ink); }
+
+/* Tekst wpisu dzielony na karty (kolumny przesuwane w poziomie) */
+.wfrp4e-grimoires.gr-illuminated .gr-flow { position: relative; z-index: 1; flex: 1; min-height: 0; margin-top: 26px; overflow: hidden; }
+.wfrp4e-grimoires.gr-illuminated .gr-flow-inner { column-fill: auto; transition: transform 250ms ease; }
+.wfrp4e-grimoires.gr-illuminated .gr-flow-inner > :first-child { margin-top: 0; }
+.wfrp4e-grimoires.gr-illuminated .gr-text-page .grimoire-actions { position: relative; z-index: 1; margin-top: 8px; }
+
+/* Wstążki zwisające spod kart */
+.wfrp4e-grimoires.gr-illuminated .gr-ribbons { position: absolute; left: 28px; top: calc(100% - 2px); z-index: 5; display: flex; align-items: flex-start; gap: 7px; }
+.wfrp4e-grimoires.gr-illuminated .gr-ribbon {
+  width: 16px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.18), transparent 40%, rgba(0, 0, 0, 0.25)), var(--lore-ink);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+  cursor: pointer;
+  transition: height 150ms ease;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-ribbon.is-contents { background: linear-gradient(90deg, rgba(255, 255, 255, 0.25), transparent 40%, rgba(0, 0, 0, 0.25)), var(--gr-brass); }
+.wfrp4e-grimoires.gr-illuminated .gr-ribbon:hover { height: 34px; }
+.wfrp4e-grimoires.gr-illuminated .gr-ribbon.active { height: 40px; }
+.wfrp4e-grimoires.gr-illuminated .gr-ribbon:focus-visible { height: 40px; outline: none; filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px var(--gr-brass)); }
+
+/* Przewracanie kartki */
+.wfrp4e-grimoires.gr-illuminated .gr-spread.turning-next .grimoire-page.right { transform-origin: left center; animation: gr-turn-next 260ms ease-out; }
+.wfrp4e-grimoires.gr-illuminated .gr-spread.turning-prev .grimoire-page.left { transform-origin: right center; animation: gr-turn-prev 260ms ease-out; }
+@keyframes gr-turn-next { from { transform: perspective(1400px) rotateY(-75deg); opacity: 0.3; } to { transform: none; opacity: 1; } }
+@keyframes gr-turn-prev { from { transform: perspective(1400px) rotateY(75deg); opacity: 0.3; } to { transform: none; opacity: 1; } }
+
+/* ─── Iluminowany inicjał i znak wodny szkoły ─── */
+.wfrp4e-grimoires.gr-illuminated .gr-watermark {
+  position: absolute;
+  right: 12%;
+  bottom: 16%;
+  z-index: 0;
+  width: 46%;
+  aspect-ratio: 1;
+  color: var(--lore-ink);
+  opacity: 0.06;
+  pointer-events: none;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-watermark .gr-icon { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated .gr-text-page .gr-flow-inner > p:first-of-type::first-letter {
+  float: left;
+  margin: 4px 8px 0 0;
+  padding: 7px 7px 3px;
+  font-family: var(--gr-display);
+  font-size: 3.1em;
+  line-height: 0.8;
+  color: var(--lore-ink);
+  background: var(--lore-wash);
+  border: 3px double var(--lore-ink);
+}
+
+/* ─── Znaki szczególne stron (warstwa nad pergaminem, pod tekstem) ─── */
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page[data-lore]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Magia Prosta: kleksy i notatki na marginesie */
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page[data-lore="petty"]::after {
+  background:
+    radial-gradient(circle at 16% 90%, rgba(70, 48, 25, 0.2) 0 9px, transparent 10px),
+    radial-gradient(circle at 21% 87%, rgba(70, 48, 25, 0.16) 0 3px, transparent 4px),
+    radial-gradient(circle at 13% 85%, rgba(70, 48, 25, 0.14) 0 2px, transparent 3px);
+}
+
+/* Zwierzęta: ślady pazurów przy zewnętrznej krawędzi */
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page[data-lore="beasts"]::after {
+  background: repeating-linear-gradient(112deg, transparent 0 10px, rgba(122, 68, 12, 0.24) 10px 12px, transparent 12px 18px) no-repeat;
+  background-size: 42px 130px;
+  background-position: right 12px bottom 46px;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page.left[data-lore="beasts"]::after { background-position: left 12px bottom 46px; }
+
+/* Śmierć: czarna obwódka żałobna */
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page[data-lore="death"]::after {
+  box-shadow: inset 0 0 0 5px rgba(28, 16, 32, 0.82), inset 0 0 0 8px rgba(87, 40, 106, 0.3);
+}
+
+/* Ogień: przypalone brzegi kartki */
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page[data-lore="fire"]::after {
+  box-shadow: inset 0 0 26px 6px rgba(80, 28, 4, 0.42), inset 0 0 5px 2px rgba(35, 12, 0, 0.55);
+}
+
+/* Niebiosa: siatka mapy nieba */
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page[data-lore="heavens"]::after {
+  background:
+    radial-gradient(circle, rgba(29, 74, 131, 0.28) 1px, transparent 1.6px) 0 0 / 26px 26px,
+    linear-gradient(rgba(29, 74, 131, 0.07) 1px, transparent 1px) 0 0 / 52px 52px,
+    linear-gradient(90deg, rgba(29, 74, 131, 0.07) 1px, transparent 1px) 0 0 / 52px 52px;
+}
+
+/* Metal: złocone linie rubryk */
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page[data-lore="metal"]::after {
+  box-shadow: inset 0 4px 0 rgba(160, 122, 28, 0.55), inset 0 -4px 0 rgba(160, 122, 28, 0.55);
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-page[data-lore="metal"] .gr-rule { color: #a07a1c; }
+
+/* Życie: zasuszony liść; Guślarstwo: przypięta gałązka */
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page.left[data-lore="life"]::after {
+  background-color: rgba(46, 107, 46, 0.22);
+  -webkit-mask: url("../assets/ui/lores/life.svg") no-repeat left 14px bottom 44px / 70px 70px;
+  mask: url("../assets/ui/lores/life.svg") no-repeat left 14px bottom 44px / 70px 70px;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page.left[data-lore="hedgecraft"]::after {
+  background-color: rgba(91, 106, 42, 0.24);
+  -webkit-mask: url("../assets/ui/lores/hedgecraft.svg") no-repeat left 14px bottom 44px / 70px 70px;
+  mask: url("../assets/ui/lores/hedgecraft.svg") no-repeat left 14px bottom 44px / 70px 70px;
+}
+
+/* Światło: złocony inicjał */
+.wfrp4e-grimoires.gr-illuminated .grimoire-page[data-lore="light"] .gr-flow-inner > p:first-of-type::first-letter {
+  color: #3b2a05;
+  background: linear-gradient(135deg, #f4d77a, #c9a227 55%, #a07a1c);
+  border-color: #7d5e1f;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page[data-lore="light"]::after {
+  background: radial-gradient(ellipse at 50% 0%, rgba(201, 162, 39, 0.16), transparent 60%);
+}
+
+/* Cienie: dym w rogach i lekko rozmyte pismo (kontrast zachowany) */
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page[data-lore="shadow"]::after {
+  background:
+    radial-gradient(ellipse at 0% 100%, rgba(70, 75, 83, 0.22), transparent 45%),
+    radial-gradient(ellipse at 100% 0%, rgba(70, 75, 83, 0.16), transparent 40%);
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-page[data-lore="shadow"] .gr-flow-inner { text-shadow: 0 0 3px rgba(70, 75, 83, 0.35); }
+
+/* Czarownictwo: szyty margines */
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page[data-lore="witchcraft"]::after {
+  background: repeating-linear-gradient(180deg, rgba(107, 31, 58, 0.5) 0 7px, transparent 7px 13px) no-repeat 14px 26px / 2px calc(100% - 56px);
+}
+
+/* Demonologia: rubryki na czarnym tle i czerwona poświata */
+.wfrp4e-grimoires.gr-illuminated .grimoire-page[data-lore="daemonology"] :is(.grimoire-details-lore, .gr-medallion-label) {
+  padding: 1px 10px;
+  color: #f2dccb;
+  background: #1c0707;
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-page[data-lore="daemonology"] .gr-flow-inner > p:first-of-type::first-letter { color: #f2dccb; background: #1c0707; border-color: #7a0f0f; }
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page[data-lore="daemonology"]::after { box-shadow: inset 0 0 30px rgba(122, 15, 15, 0.22); }
+
+/* Nekromancja: plamy na kartce */
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page[data-lore="necromancy"]::after {
+  background:
+    radial-gradient(ellipse 60px 42px at 82% 18%, rgba(79, 85, 40, 0.16), transparent 70%),
+    radial-gradient(ellipse 46px 34px at 22% 78%, rgba(79, 70, 40, 0.14), transparent 70%),
+    radial-gradient(circle at 70% 86%, rgba(60, 50, 30, 0.12) 0 6px, transparent 7px);
+}
+
+/* Chaos: falujące rubryki i niepokojąca poświata */
+.wfrp4e-grimoires.gr-illuminated .grimoire-page:is([data-lore="nurgle"], [data-lore="slaanesh"], [data-lore="tzeentch"], [data-lore="undivided"]) :is(.grimoire-details-name, .grimoire-details-lore) {
+  text-decoration: underline wavy color-mix(in srgb, var(--lore-ink) 60%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-entry .grimoire-page:is([data-lore="nurgle"], [data-lore="slaanesh"], [data-lore="tzeentch"], [data-lore="undivided"])::after {
+  background: radial-gradient(ellipse at 85% 85%, var(--lore-wash), transparent 55%), radial-gradient(ellipse at 10% 30%, var(--lore-wash), transparent 45%);
+}
+
+/* ─── Rytuał: krąg na karcie iluminowanej i ponumerowane rubryki ─── */
+.wfrp4e-grimoires.gr-illuminated .gr-ritual-circle { position: relative; flex: 0 0 auto; width: min(180px, 66%); aspect-ratio: 1; margin: 4px auto 8px; color: var(--lore-ink); }
+.wfrp4e-grimoires.gr-illuminated .gr-ritual-art { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated .gr-ritual-sigil { position: absolute; inset: 33%; display: grid; place-items: center; }
+.wfrp4e-grimoires.gr-illuminated .gr-ritual-sigil .gr-icon { width: 100%; height: 100%; }
+.wfrp4e-grimoires.gr-illuminated .gr-ritual-cn {
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  transform: translateX(-50%);
+  font-family: var(--gr-display);
+  font-size: 1.25rem;
+  color: var(--gr-ink);
+  background: var(--gr-paper);
+  border: 2px solid var(--lore-ink);
+  border-radius: 50%;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-ritual .gr-flow-inner { counter-reset: gr-step; }
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-ritual .gr-flow-inner > p { counter-increment: gr-step; }
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-ritual .gr-flow-inner > p::before {
+  content: counter(gr-step, upper-roman) ". ";
+  font-family: var(--gr-display);
+  color: var(--lore-ink);
+}
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-ritual .gr-flow-inner > p:first-of-type::first-letter { float: none; margin: 0; padding: 0; font-size: inherit; line-height: inherit; background: none; border: none; }
+.wfrp4e-grimoires.gr-illuminated .gr-spread.is-ritual .grimoire-page::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  z-index: 0;
+  border: 1px solid color-mix(in srgb, var(--lore-ink) 35%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--lore-ink) 20%, transparent);
+  outline-offset: 3px;
+  pointer-events: none;
+}
+
+/* ─── Strony zamknięte: szyfr, księga zakazana, pismo nieczytelne ─── */
+.wfrp4e-grimoires.gr-illuminated .gr-sealed {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  margin-top: 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  overflow: hidden;
+  text-align: center;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-sealed > :not(.gr-runes, .gr-chain) { position: relative; z-index: 1; }
+.wfrp4e-grimoires.gr-illuminated .gr-runes {
+  position: absolute;
+  inset: 0;
+  background-color: color-mix(in srgb, var(--gr-ink) 40%, transparent);
+  -webkit-mask: url("../assets/ui/ornaments/runes_tile.svg") repeat 0 0 / 240px 40px;
+  mask: url("../assets/ui/ornaments/runes_tile.svg") repeat 0 0 / 240px 40px;
+  opacity: 0.5;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-sealed.is-illegible .gr-runes { opacity: 0.75; }
+.wfrp4e-grimoires.gr-illuminated .gr-lock {
+  width: 92px;
+  height: 115px;
+  color: var(--gr-brass-deep);
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45));
+}
+.wfrp4e-grimoires.gr-illuminated .gr-lock .gr-icon { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated .gr-cipher-progress { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; max-width: 250px; padding: 4px 8px; background: var(--gr-paper); border-radius: 4px; }
+.wfrp4e-grimoires.gr-illuminated .gr-seal-pip { width: 24px; height: 24px; color: color-mix(in srgb, var(--gr-ink-soft) 35%, transparent); }
+.wfrp4e-grimoires.gr-illuminated .gr-seal-pip.is-filled { color: #8a1f1f; }
+.wfrp4e-grimoires.gr-illuminated .gr-seal-pip .gr-icon { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated :is(.gr-sealed-count, .gr-sealed-note) {
+  margin: 0;
+  padding: 2px 10px;
+  font-family: var(--gr-body);
+  color: var(--gr-ink);
+  background: var(--gr-paper);
+  border-radius: 3px;
+}
+.wfrp4e-grimoires.gr-illuminated .gr-sealed-note { font-style: italic; }
+/* Księga zakazana: dwa skrzyżowane łańcuchy i pieczęć z czaszką */
+.wfrp4e-grimoires.gr-illuminated .gr-chain,
+.wfrp4e-grimoires.gr-illuminated .gr-sealed.is-warded::before {
+  position: absolute;
+  left: -15%;
+  right: -15%;
+  top: calc(50% - 13px);
+  z-index: 1;
+  height: 26px;
+  background-color: #3b3632;
+  -webkit-mask: url("../assets/ui/ornaments/chain.svg") repeat-x 0 0 / 120px 26px;
+  mask: url("../assets/ui/ornaments/chain.svg") repeat-x 0 0 / 120px 26px;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+  transform: rotate(-28deg);
+}
+.wfrp4e-grimoires.gr-illuminated .gr-sealed.is-warded::before { content: ""; transform: rotate(28deg); }
+.wfrp4e-grimoires.gr-illuminated .gr-ward-seal { z-index: 2; width: 92px; height: 92px; color: #5a0e0e; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.5)); }
+.wfrp4e-grimoires.gr-illuminated .gr-ward-wax { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated .gr-ward-seal > span { position: absolute; inset: 27%; color: #f2dccb; }
+.wfrp4e-grimoires.gr-illuminated .gr-ward-seal > span .gr-icon { width: 100%; height: 100%; vertical-align: top; }
+/* Strona zakazana widziana przez gracza: zwykła nieprzeczytana karta z pieczęcią, bez ostrzeżeń */
+.wfrp4e-grimoires.gr-illuminated .gr-sealed.is-unread .gr-runes { display: none; }
+.wfrp4e-grimoires.gr-illuminated .gr-unread-seal { width: 84px; height: 84px; color: #6b4a2a; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.4)); }
+.wfrp4e-grimoires.gr-illuminated .gr-unread-seal > span { position: absolute; inset: 28%; color: #f2e6cc; }
+.wfrp4e-grimoires.gr-illuminated .gr-unread-seal > span .gr-icon { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated .gr-illegible-mark .gr-icon { width: 64px; height: 64px; color: var(--gr-ink-soft); }
+
+/* ─── Skryptorium: pulpit z kałamarzem ─── */
+.wfrp4e-grimoires.gr-illuminated .grimoire-editbar {
+  position: relative;
+  padding: 10px 14px 10px 94px;
+  color: var(--gr-ink);
+  background: var(--gr-paper) var(--gr-parchment);
+  border: 5px solid #5a3a20;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35), inset 0 0 14px rgba(90, 60, 25, 0.25), 0 3px 6px rgba(0, 0, 0, 0.5);
+}
+.wfrp4e-grimoires.gr-illuminated .gr-desk-ink { position: absolute; left: 8px; bottom: 6px; width: 76px; height: 57px; color: var(--gr-ink); }
+.wfrp4e-grimoires.gr-illuminated .gr-desk-ink .gr-icon { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated .grimoire-editbar label { font-family: var(--gr-display); letter-spacing: 0.04em; color: var(--gr-ink); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-editbar :is(input[type="text"], input[type="number"], select) {
+  color: var(--gr-ink);
+  background: rgba(255, 250, 235, 0.75);
+  border: none;
+  border-bottom: 1px solid var(--gr-ink-soft);
+  border-radius: 0;
+  font-family: var(--gr-body);
+}
+.wfrp4e-grimoires.gr-illuminated .grimoire-editbar :is(input, select):focus-visible { outline: 2px solid var(--gr-brass); outline-offset: 1px; }
+.wfrp4e-grimoires.gr-illuminated .grimoire-editbar input[type="checkbox"] { accent-color: var(--gr-brass-deep); }
+.wfrp4e-grimoires.gr-illuminated .grimoire-editbar .grimoire-drop-hint { font-family: var(--gr-body); color: var(--gr-ink-soft); }
+
+/* Przeciąganie zaklęcia: czyste karty świecą jako miejsce do wpisania */
+.wfrp4e-grimoires.gr-illuminated.gr-dropping .gr-spread { box-shadow: 0 6px 14px rgba(0, 0, 0, 0.55), 0 0 0 3px var(--gr-brass); }
+.wfrp4e-grimoires.gr-illuminated.gr-dropping .gr-empty-slot {
+  color: var(--gr-ink);
+  background: rgba(201, 162, 75, 0.12);
+  border: 2px dashed var(--gr-brass-deep);
+  animation: gr-pulse 900ms ease-in-out infinite alternate;
+}
+@keyframes gr-pulse { to { background: rgba(201, 162, 75, 0.3); } }
+
+/* ─── Zwój: pieczęć szkoły i cień przy wałkach ─── */
+.wfrp4e-grimoires.gr-illuminated .scroll-parchment { box-shadow: inset 0 12px 10px -8px rgba(60, 35, 10, 0.35), inset 0 -12px 10px -8px rgba(60, 35, 10, 0.35); }
+.wfrp4e-grimoires.gr-illuminated .scroll-foot { position: relative; }
+.wfrp4e-grimoires.gr-illuminated .gr-scroll-seal {
+  position: relative;
+  float: right;
+  width: 64px;
+  height: 64px;
+  margin: -4px 0 4px 10px;
+  color: var(--lore-ink);
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4));
+}
+.wfrp4e-grimoires.gr-illuminated .gr-scroll-wax { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated .gr-scroll-seal-sigil { position: absolute; inset: 25%; color: #f6ead0; }
+.wfrp4e-grimoires.gr-illuminated .gr-scroll-seal-sigil .gr-icon { width: 100%; height: 100%; vertical-align: top; }
+.wfrp4e-grimoires.gr-illuminated .gr-scroll-seal-count {
+  position: absolute;
+  right: -6px;
+  bottom: -2px;
+  padding: 0 5px;
+  font-family: var(--gr-display);
+  font-size: 0.95rem;
+  color: var(--gr-ink);
+  background: var(--gr-paper);
+  border: 1px solid var(--lore-ink);
+  border-radius: 9px;
+}
+
+.wfrp4e-grimoires.gr-illuminated .scroll-body .grimoire-description > p:first-of-type::first-letter {
+  float: left;
+  margin: 4px 8px 0 0;
+  padding: 6px 6px 2px;
+  font-family: var(--gr-display);
+  font-size: 2.8em;
+  line-height: 0.8;
+  color: var(--lore-ink);
+  background: var(--lore-wash);
+  border: 3px double var(--lore-ink);
+}
+
+/* ─── Karta czatu: wyrwana strona księgi (klasa body.gr-illuminated-chat) ─── */
+body:not(.gr-illuminated-chat) .wfrp4e-grimoires-chat :is(.gr-chat-marg, .gr-chat-sigil, .gr-chat-cn, .gr-chat-icon) { display: none; }
+.wfrp4e-grimoires-chat { --lore-ink: #2a3550; }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat {
+  position: relative;
+  overflow: hidden;
+  padding: 8px 10px 6px;
+  color: #2a1d12;
+  background: #f1e4c3 url("../../../systems/wfrp4e/ui/backgrounds/parchment-texture.webp");
+  border: 1px solid rgba(60, 40, 20, 0.4);
+  box-shadow: inset 0 0 18px rgba(90, 60, 25, 0.25);
+  font-family: "GR Caslon", "Adobe Caslon Pro", serif;
+}
+body.gr-illuminated-chat .wfrp4e-grimoires-chat svg.gr-icon { width: 100%; height: 100%; fill: currentColor; vertical-align: top; }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .gr-chat-marg { position: absolute; top: -4px; right: -4px; width: 74px; height: 74px; color: var(--lore-ink); opacity: 0.22; transform: scaleX(-1); pointer-events: none; }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat header { position: relative; display: flex; align-items: center; gap: 8px; padding-bottom: 4px; border-bottom: 2px solid var(--lore-ink); }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat header img { display: none; }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .gr-chat-sigil { flex: 0 0 32px; width: 32px; height: 32px; color: var(--lore-ink); }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat h3 { margin: 0; border: none; font-family: "GR Caslon Antique", serif; font-weight: bold; font-size: 1.2rem; color: #2a1d12; }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .lore { font-family: "GR Nodesto", serif; letter-spacing: 0.05em; color: var(--lore-ink); }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .gr-chat-cn { position: relative; flex: 0 0 40px; width: 40px; height: 40px; margin-left: auto; color: var(--lore-ink); }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .gr-chat-cn > span { position: absolute; inset: 0; }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .gr-chat-cn b { position: absolute; inset: 0; display: grid; place-items: center; font-family: "GR Nodesto", serif; font-size: 1.05rem; color: #2a1d12; }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .stats { position: relative; display: grid; gap: 2px; margin: 6px 0; }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .stats b { font-family: "GR Nodesto", serif; font-weight: normal; letter-spacing: 0.04em; color: var(--lore-ink); }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .gr-chat-icon { display: inline-block; width: 1em; height: 1em; margin-right: 4px; vertical-align: -0.15em; color: var(--lore-ink); }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .description { position: relative; line-height: 1.4; }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .description > p:first-of-type::first-letter { float: left; margin: 2px 6px 0 0; padding: 3px 5px 1px; font-family: "GR Nodesto", serif; font-size: 2.3em; line-height: 0.8; color: var(--lore-ink); border: 2px double var(--lore-ink); }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat footer { margin-top: 4px; padding-top: 3px; font-family: "GR Nodesto", serif; letter-spacing: 0.04em; color: #5c4530; border-top: 1px dashed rgba(92, 69, 48, 0.5); }
+
+/* Jasna okładka: ciemny napis zamiast złotego */
+.wfrp4e-grimoires.gr-illuminated .grimoire.is-light-cover .grimoire-cover-bar { color: #2a1d12; }
+.wfrp4e-grimoires.gr-illuminated .grimoire.is-light-cover .grimoire-title { text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); }
+.wfrp4e-grimoires.gr-illuminated .grimoire.is-light-cover .grimoire-edit-toggle { color: #2a1d12; border-color: var(--gr-brass-deep); }
+
+@media (prefers-reduced-motion: reduce) {
+  .wfrp4e-grimoires.gr-illuminated * { transition: none !important; animation: none !important; }
+}

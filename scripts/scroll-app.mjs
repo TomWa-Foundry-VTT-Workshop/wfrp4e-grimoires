@@ -10,6 +10,7 @@ import { requirementBadges } from "./requirements.mjs";
 import { inscribeEntry } from "./scrolls.mjs";
 import { bookContext } from "./actors.mjs";
 import { getSettings } from "./settings.mjs";
+import { actionGlyph, applyAccessibility, badgeGlyph, loreGlyph, loreTheme, useIlluminated } from "./ui.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 const TextEditorImpl = () => foundry.applications.ux.TextEditor.implementation;
@@ -79,17 +80,21 @@ export class ScrollApp extends HandlebarsApplicationMixin(ApplicationV2) {
       const type = typeOf(entry);
       const info = await type.details(entry, type.status(entry, ctx), ctx);
       const name = type.name(entry);
+      const loreKey = type.group(entry).key;
       details = {
+        theme: hidden || type.id !== "spell" ? "arcane" : loreTheme(loreKey),
+        glyph: hidden ? "lore-arcane" : loreGlyph(loreKey, type.id),
         name: hidden ? illegible(name) : name,
         subtitle: hidden ? illegible(info.subtitle) : info.subtitle,
         stats: info.stats,
         description: hidden ? "" : info.description,
         note: info.note,
-        actions: hidden ? info.actions.filter((a) => a.primary) : info.actions
+        actions: (hidden ? info.actions.filter((a) => a.primary) : info.actions).map((action) => ({ ...action, glyph: actionGlyph(action) }))
       };
     }
 
     return {
+      illuminated: useIlluminated(),
       details,
       hidden,
       count: scrollCount(this.scroll),
@@ -98,6 +103,7 @@ export class ScrollApp extends HandlebarsApplicationMixin(ApplicationV2) {
       customLanguage: LANGUAGES[book.language] ? "" : book.language,
       badges: actor ? requirementBadges(reading, book.requirements).map((b) => ({
         ...b,
+        glyph: badgeGlyph(b.key),
         label: b.key === "language" ? t("Badge.language", { language: languageLabel(book.language) }) : t(`Badge.${b.key}`)
       })) : [],
       actorName: actor?.name,
@@ -108,6 +114,9 @@ export class ScrollApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
   _onRender(context, options) {
     super._onRender(context, options);
+    this.element.classList.toggle("gr-illuminated", Boolean(context.illuminated));
+    this.element.dataset.lore = context.details?.theme ?? "";
+    applyAccessibility(this.element);
     if (this.window?.title) this.window.title.textContent = this.title;
     const html = this.element;
 

@@ -15,10 +15,32 @@ Tomes and scrolls for **WFRP4e 10.x**: their own inventory sections and an open-
 
 * **Left page**: spells grouped by Lore, with CN, a search box and markers: *memorised* ✔, *on your sheet, not memorised* 📖 and *read only* 👁.
 * **Right page**: the selected spell's CN, range, target, duration and full description. The page turns as you pick a spell.
+* In the *Illuminated* look (default) the tome opens on a title page and a table of contents with page numbers and blank pages for free entries. Every entry has its own spread; turn the pages with the page corners, the arrow keys (Home returns to the contents) or the coloured ribbons below the pages. A long description continues on the next sheet.
 * **Header**: requirement badges for the character, Read/Write, the book's language and Carried.
 * **Actions**: **Cast from the grimoire**, **Channel** (4e), **Memorise**, **To chat**, **Spell sheet**.
 * Characters who can't read the book see illegible runes instead of spell names. The GM always sees the text.
 * **Edit mode** (✒ button, owner and GM only): drag entries onto the book, reorder or remove them, set the language (Magick, Reikspiel, Eltharin… or your own), pick the cover colour and decide what this book requires of its reader: literacy, its language, being carried and, for spells, knowing the Lore.
+
+## 🎨 Illuminated look
+
+By default (client setting **Tome look**) a tome looks like an illuminated spellbook: a leather cover in the book's colour with brass fittings, parchment pages, gilt titles in the WFRP4e fonts and silk ribbons hanging below the pages.
+
+* **Pages**: the tome opens on a title page and a table of contents. Each entry has its own spread; a long description continues on further sheets. Turn the pages with the page corners, the arrow keys (Home returns to the contents) or the ribbons.
+* **Schools of magic**: each school has its own ink colour, sigil and corner marginalia, and marks its pages in its own way, e.g. scorched edges for Fire, a mourning border for Death, a star chart for the Heavens, black rubrics for Daemonology.
+* **Rituals** fill the whole book and get a ritual circle and numbered rubrics.
+* **Locked pages**: runes and a lock with wax seals for decoding progress, chains and a skull seal for forbidden pages. The colours don't give away the school of a page the character can't read.
+* **Scriptorium**: edit mode is a writing desk, and blank pages light up while you drag a spell over the tome.
+* **Scroll and chat**: the scroll gets a wax seal of its school; a spell sent to chat looks like a page torn from the tome.
+* Everything works from the keyboard and every icon has a label for screen readers.
+
+| | |
+|---|---|
+| ![Contents](docs/screenshots/illuminated-contents.png) | ![A spell spread](docs/screenshots/illuminated-spell.png) |
+| ![A ritual](docs/screenshots/illuminated-ritual.png) | ![A ciphered page](docs/screenshots/illuminated-cipher.png) |
+
+![Schools of magic](docs/screenshots/illuminated-schools.png)
+
+![Scroll, chat card and a forbidden page](docs/screenshots/illuminated-scroll-chat.png)
 
 ## ✨ Spells from the grimoire on the sheet
 
@@ -32,11 +54,14 @@ While a grimoire is carried, every spell the character can cast from it appears 
 
 ## 🔏 What a book can demand
 
-All of these are off by default. The GM sets them per book in edit mode.
+A new tome holds **4 entries**, as an ordinary spellbook holds about four spells. A **ritual takes the whole book**: it goes only into an empty tome, and nothing else fits after it. The GM can change the number of entries per book in edit mode or leave the field empty for no limit. Tomes made before this rule, scrolls and alchemy recipe books have no entry limit.
+
+Everything below is off by default. The GM sets it per book in edit mode.
 
 * **Pages**: a limit on how much fits. A spell takes 1 page, plus 1 for every 5 CN.
 * **Cipher**: each page must be worked out with a test of the skill you choose (the book's language by default). Each success adds its SL, and a page needs the set SL per page. A fumble or a failure of -3 SL or worse loses the work on that page. Progress belongs to the character.
-* **Forbidden**: reading a page for the first time is a Corruption exposure of the chosen strength, using the system's own test.
+* **Forbidden**: reading a page for the first time is a Corruption exposure of the chosen strength, using the system's own test. Players don't see this in advance: to them the page is simply unread, with a **Read the page** button, and they learn about the Corruption only from the test. The GM sees the warning everywhere.
+* **Hands**: a carried tome is held in both hands by default (the GM can set one hand or none). It counts towards the character's equip points like a weapon, so with the system setting that limits equipped weapons a character can't hold the book and draw a weapon beyond their free hands, and the header shows how many hands it takes.
 
 **Copy to another book** writes an entry into another of the character's books with a Challenging test. A failure leaves a flawed copy (a spell has CN +2), and a failure of -2 SL or worse ruins it.
 
@@ -51,6 +76,8 @@ All of these are off by default. The GM sets them per book in edit mode.
 
 * Failed scroll test uses up the scroll
 * Name scrolls after their contents
+
+Each player also chooses the **Tome look** (client setting): *Illuminated* (default) shows a leather-bound spellbook with brass fittings, styled by the school of magic, or *Classic* keeps the plain look.
 
 What a book requires of its reader is set on each book, in edit mode.
 

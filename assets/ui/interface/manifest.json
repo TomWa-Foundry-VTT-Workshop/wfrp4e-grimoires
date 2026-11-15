@@ -1,0 +1,182 @@
+[
+  {
+    "id": "status_known",
+    "file": "status_known.svg",
+    "subject": "wax seal with a check-like notch cut into it (memorised)"
+  },
+  {
+    "id": "status_unmemorized",
+    "file": "status_unmemorized.svg",
+    "subject": "bookmark ribbon hanging from the top of a closed book (cast from the book)"
+  },
+  {
+    "id": "status_read_only",
+    "file": "status_read_only.svg",
+    "subject": "open eye"
+  },
+  {
+    "id": "status_unreadable",
+    "file": "status_unreadable.svg",
+    "subject": "eye crossed by a smear / blot"
+  },
+  {
+    "id": "status_learnable",
+    "file": "status_learnable.svg",
+    "subject": "quill crossing a small open book"
+  },
+  {
+    "id": "status_flawed",
+    "file": "status_flawed.svg",
+    "subject": "ink blot with splashes (a flawed copy)"
+  },
+  {
+    "id": "req_read_write",
+    "file": "req_read_write.svg",
+    "subject": "quill pen standing in an inkpot"
+  },
+  {
+    "id": "req_language",
+    "file": "req_language.svg",
+    "subject": "open book with two curved speech lines coming from it"
+  },
+  {
+    "id": "req_carried",
+    "file": "req_carried.svg",
+    "subject": "leather strap with a buckle looped around a book"
+  },
+  {
+    "id": "req_lore",
+    "file": "req_lore.svg",
+    "subject": "small closed book with a bookmark star on its cover"
+  },
+  {
+    "id": "req_pages",
+    "file": "req_pages.svg",
+    "subject": "stack of three loose sheets, slightly fanned"
+  },
+  {
+    "id": "req_cipher",
+    "file": "req_cipher.svg",
+    "subject": "padlock with a keyhole"
+  },
+  {
+    "id": "req_forbidden",
+    "file": "req_forbidden.svg",
+    "subject": "closed book bound by a crossed chain"
+  },
+  {
+    "id": "stat_cn",
+    "file": "stat_cn.svg",
+    "subject": "round medallion with a small flame inside (Casting Number)"
+  },
+  {
+    "id": "stat_range",
+    "file": "stat_range.svg",
+    "subject": "arrow flying over a dashed arc"
+  },
+  {
+    "id": "stat_target",
+    "file": "stat_target.svg",
+    "subject": "concentric rings with a dot (target)"
+  },
+  {
+    "id": "stat_duration",
+    "file": "stat_duration.svg",
+    "subject": "small hourglass on its side next to a tick mark"
+  },
+  {
+    "id": "stat_ingredient",
+    "file": "stat_ingredient.svg",
+    "subject": "mortar and pestle"
+  },
+  {
+    "id": "act_cast",
+    "file": "act_cast.svg",
+    "subject": "wizard's staff, top crowned by a burst"
+  },
+  {
+    "id": "act_channel",
+    "file": "act_channel.svg",
+    "subject": "spiral vortex drawn inward"
+  },
+  {
+    "id": "act_memorise",
+    "file": "act_memorise.svg",
+    "subject": "lit candle in front of a head silhouette in profile"
+  },
+  {
+    "id": "act_chat",
+    "file": "act_chat.svg",
+    "subject": "unrolled scroll with a curling end"
+  },
+  {
+    "id": "act_sheet",
+    "file": "act_sheet.svg",
+    "subject": "open book with an arrow pointing out of the top right corner"
+  },
+  {
+    "id": "act_copy",
+    "file": "act_copy.svg",
+    "subject": "quill pen above two overlapping pages"
+  },
+  {
+    "id": "act_decipher",
+    "file": "act_decipher.svg",
+    "subject": "key turning in a keyhole plate"
+  },
+  {
+    "id": "act_unseal",
+    "file": "act_unseal.svg",
+    "subject": "broken chain with one link open"
+  },
+  {
+    "id": "act_edit",
+    "file": "act_edit.svg",
+    "subject": "quill pen nib, angled"
+  },
+  {
+    "id": "act_move_up",
+    "file": "act_move_up.svg",
+    "subject": "pointed bookmark tab pointing up"
+  },
+  {
+    "id": "act_move_down",
+    "file": "act_move_down.svg",
+    "subject": "pointed bookmark tab pointing down"
+  },
+  {
+    "id": "act_remove",
+    "file": "act_remove.svg",
+    "subject": "page torn in two"
+  },
+  {
+    "id": "act_search",
+    "file": "act_search.svg",
+    "subject": "magnifying glass with a wooden handle"
+  },
+  {
+    "id": "nav_prev",
+    "file": "nav_prev.svg",
+    "subject": "page corner curling to the left"
+  },
+  {
+    "id": "nav_next",
+    "file": "nav_next.svg",
+    "subject": "page corner curling to the right"
+  },
+  {
+    "id": "nav_contents",
+    "file": "nav_contents.svg",
+    "subject": "ribbon bookmark with a forked tail"
+  },
+  {
+    "id": "new_tome",
+    "file": "new_tome.svg",
+    "subject": "closed book with a small star-burst on the corner"
+  },
+  {
+    "id": "new_scroll",
+    "file": "new_scroll.svg",
+    "subject": "unrolled scroll with a small star-burst meaning new"
+  }
+]

@@ -27,7 +27,10 @@
       "language": "Language ({language})",
       "carried": "Carried",
       "notCarried": "Not carried",
-      "pages": "{used}/{total} pages"
+      "slots": "Entries: {used}/{total}",
+      "pages": "{used}/{total} pages",
+      "hands1": "1 hand",
+      "hands2": "2 hands"
     },
     "Status": {
       "known": "You know this spell",
@@ -79,6 +82,8 @@
         "carried": "Must be carried",
         "lore": "Caster must know the Lore"
       },
+      "SlotsHint": "How many spells the book holds. An ordinary spellbook holds 4; a ritual takes the whole book. Type any number, or leave it empty for no limit.",
+      "Slots": "Spells it holds",
       "Pages": "Pages",
       "Cipher": "Cipher",
       "CipherNone": "None",
@@ -86,7 +91,14 @@
       "CipherSkillDefault": "Book's language",
       "CipherSL": "SL per page",
       "Forbidden": "Forbidden",
-      "ForbiddenNone": "No"
+      "ForbiddenNone": "No",
+      "Hands": "Held in",
+      "HandsHint": "How many hands the book takes while carried. A spellbook is held in both hands; with the system's limit on equipped weapons, a character can't hold the book and a weapon beyond their free hands.",
+      "HandsOptions": {
+        "2": "both hands",
+        "1": "one hand",
+        "0": "no hands"
+      }
     },
     "Learn": {
       "Title": "Memorise a spell",
@@ -111,13 +123,21 @@
     "Notify": {
       "AlreadyInBook": "{name} is already in this tome.",
       "NotWritable": "This can't be written here.",
-      "NoRoom": "Not enough pages: this needs {needed}, {free} free."
+      "NoRoom": "Not enough pages: this needs {needed}, {free} free.",
+      "WholeBook": "A ritual takes the whole book: it can only go into an empty one, and nothing more fits after it.",
+      "NoSlot": "The book is full ({total} entries)."
     },
     "Settings": {
       "ConsumeOnFailureName": "Failed scroll test uses up the scroll",
       "ConsumeOnFailureHint": "When off, a scroll is used up only after a successful casting test.",
       "RenameScrollsName": "Name scrolls after their contents",
-      "RenameScrollsHint": "Inscribing an entry renames the scroll."
+      "RenameScrollsHint": "Inscribing an entry renames the scroll.",
+      "BookStyleName": "Tome look",
+      "BookStyleHint": "Illuminated: the tome and scroll windows look like an illuminated spellbook, styled by the school of magic. Classic: the previous plain look.",
+      "BookStyle": {
+        "illuminated": "Illuminated",
+        "classic": "Classic"
+      }
     },
     "Aliases": {
       "ReadWrite": "Read/Write",
@@ -183,11 +203,13 @@
       "warded": "Forbidden page",
       "Note": {
         "ciphered": "This page is written in cipher. Each attempt adds the SL you score; a fumble or a failure of -3 SL or worse loses the work so far.",
-        "warded": "Reading this page is a {strength} exposure to Corruption."
+        "warded": "Reading this page is a {strength} exposure to Corruption.",
+        "unread": "You have not read this page yet."
       },
       "Sealed": {
         "ciphered": "The page is written in cipher.",
-        "warded": "You have not dared to read this page yet."
+        "warded": "You have not dared to read this page yet.",
+        "unread": "This page is still unread."
       },
       "Decipher": "Decipher",
       "DecipherTitle": "Deciphering: {book}",
@@ -207,7 +229,25 @@
       "CopiedFlawed": "{name} copied into {book}, with errors.",
       "CopyRuined": "The copy of {name} is ruined.",
       "Flawed": "Flawed copy",
-      "FlawSpell": "CN +{penalty}."
+      "FlawSpell": "CN +{penalty}.",
+      "unread": "Unread page",
+      "ReadUnread": "Read the page",
+      "UnreadConfirm": "Begin reading this page?"
+    },
+    "Spread": {
+      "Contents": "Contents",
+      "Owner": "Property of {name}",
+      "Folio": "f. {folio}",
+      "EmptySlot": "— blank pages —",
+      "Ritual": "A ritual: it fills the whole book",
+      "Sheet": "Sheet {sheet} of {sheets}",
+      "Prev": "Previous page (←)",
+      "Next": "Next page (→)",
+      "KeysHint": "Turn the pages with the arrow keys; Home returns to the contents.",
+      "CipherProgress": "Worked out {done} of {needed} SL"
+    },
+    "Hands": {
+      "Full": "Not enough free hands for {name}: it needs {need}, {free} free (held: {held})."
     }
   }
 }

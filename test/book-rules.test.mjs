@@ -1,19 +1,63 @@
 import { describe, expect, it } from "vitest";
 import {
-  CIPHERED, OPEN, WARDED, applyDecode, copyOutcome, decodeNeeded, entryProgress, fits, freePages, markKnown, markRead,
-  openEntries, pageState, pagesUsed
+  CIPHERED, OPEN, WARDED, applyDecode, copyOutcome, decodeNeeded, entryProgress, fits, freePages, freeSlots, markKnown, markRead,
+  noRoomReason, openEntries, pageState, pagesUsed, slotsUsed
 } from "../scripts/book-rules.mjs";
-import { emptyBook, readBook } from "../scripts/grimoire-data.mjs";
+import { DEFAULT_SLOTS, emptyBook, readBook } from "../scripts/grimoire-data.mjs";
 import { flawSpell, spellPages, spellSummary } from "../scripts/spell-data.mjs";
 
 const entry = (id, size = 1) => ({ id, type: "spell", size, data: {} });
 const pagesOf = (e) => e.size;
 const book = (extra = {}) => ({ ...emptyBook(), ...extra });
 
+describe("zapisy: 4 zaklęcia albo rytuał", () => {
+  const ritual = (id) => ({ ...entry(id), ritual: true });
+  const wholeOf = (e) => Boolean(e.ritual);
+
+  it("nowa księga ma 4 zapisy, zwój i stare księgi bez limitu", () => {
+    expect(DEFAULT_SLOTS).toBe(4);
+    expect(emptyBook().slots).toBe(4);
+    expect(emptyBook("scroll").slots).toBeNull();
+    const flagged = (grimoire) => ({ flags: { "wfrp4e-grimoires": { grimoire } } });
+    expect(readBook(flagged({ entries: [] })).slots).toBeNull();
+    expect(readBook(flagged({ entries: [], slots: 4 })).slots).toBe(4);
+    expect(readBook(flagged({ form: "scroll", entries: [], slots: 4 })).slots).toBeNull();
+  });
+
+  it("piąte zaklęcie się nie mieści", () => {
+    const b = book({ entries: ["a", "b", "c"].map((id) => entry(id)) });
+    expect(slotsUsed(b, wholeOf)).toBe(3);
+    expect(freeSlots(b, wholeOf)).toBe(1);
+    expect(fits(b, entry("d"), pagesOf, wholeOf)).toBe(true);
+    const full = book({ entries: ["a", "b", "c", "d"].map((id) => entry(id)) });
+    expect(noRoomReason(full, entry("e"), pagesOf, wholeOf)).toBe("slots");
+  });
+
+  it("rytuał zajmuje całą księgę", () => {
+    expect(fits(book(), ritual("r"), pagesOf, wholeOf)).toBe(true);
+    expect(noRoomReason(book({ entries: [entry("a")] }), ritual("r"), pagesOf, wholeOf)).toBe("whole");
+    const withRitual = book({ entries: [ritual("r")] });
+    expect(slotsUsed(withRitual, wholeOf)).toBe(4);
+    expect(noRoomReason(withRitual, entry("a"), pagesOf, wholeOf)).toBe("slots");
+  });
+
+  it("bez limitu zapisów liczą się tylko strony", () => {
+    const b = book({ slots: null, pages: 3, entries: ["a", "b", "c", "d", "e"].map((id) => entry(id, 0)) });
+    expect(freeSlots(b, wholeOf)).toBe(Infinity);
+    expect(fits(b, ritual("r"), pagesOf, wholeOf)).toBe(true);
+    expect(noRoomReason(b, entry("x", 4), pagesOf, wholeOf)).toBe("pages");
+  });
+
+  it("limit stron działa razem z zapisami", () => {
+    const b = book({ pages: 2, entries: [entry("a", 2)] });
+    expect(noRoomReason(b, entry("b", 1), pagesOf, wholeOf)).toBe("pages");
+  });
+});
+
 describe("pojemność", () => {
   it("bez limitu mieści wszystko", () => {
     expect(freePages(book({ entries: [entry("a", 9)] }), pagesOf)).toBe(Infinity);
-    expect(fits(book(), entry("a", 500), pagesOf)).toBe(true);
+    expect(fits(book({ slots: null }), entry("a", 500), pagesOf)).toBe(true);
   });
 
   it("limit stron liczy zajęte strony", () => {

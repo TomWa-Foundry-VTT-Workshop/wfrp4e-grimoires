@@ -26,8 +26,35 @@ export function freePages(book, pagesOf = () => 1) {
   return book.pages ? Math.max(0, book.pages - pagesUsed(book, pagesOf)) : Infinity;
 }
 
-export function fits(book, entry, pagesOf = () => 1) {
-  return pagesOf(entry) <= freePages(book, pagesOf);
+/**
+ * Zajęte zapisy. Wpis, który zajmuje całą księgę (rytuał), wypełnia wszystkie.
+ * @param {(entry: object) => boolean} wholeOf  czy wpis zajmuje całą księgę
+ */
+export function slotsUsed(book, wholeOf = () => false) {
+  if (!book.slots) return book.entries.length;
+  return book.entries.some(wholeOf) ? book.slots : Math.min(book.slots, book.entries.length);
+}
+
+/** Wolne zapisy; `Infinity`, gdy księga nie ma limitu zapisów. */
+export function freeSlots(book, wholeOf = () => false) {
+  return book.slots ? Math.max(0, book.slots - slotsUsed(book, wholeOf)) : Infinity;
+}
+
+/**
+ * Dlaczego wpis się nie zmieści: "slots", "whole" (rytuał wymaga pustej księgi), "pages" albo `null`, gdy się mieści.
+ * Limit zapisów i limit stron działają niezależnie; księga może mieć oba.
+ */
+export function noRoomReason(book, entry, pagesOf = () => 1, wholeOf = () => false) {
+  if (book.slots) {
+    if (wholeOf(entry) && book.entries.length) return "whole";
+    if (freeSlots(book, wholeOf) < 1) return "slots";
+  }
+  if (pagesOf(entry) > freePages(book, pagesOf)) return "pages";
+  return null;
+}
+
+export function fits(book, entry, pagesOf = () => 1, wholeOf = () => false) {
+  return noRoomReason(book, entry, pagesOf, wholeOf) === null;
 }
 
 /** Ile PS trzeba zebrać, by odczytać stronę. */

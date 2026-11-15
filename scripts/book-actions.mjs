@@ -5,7 +5,7 @@
 import { t } from "./constants.mjs";
 import { FORM_BOOK, addEntry, isGrimoire, readBook, writeBook } from "./grimoire-data.mjs";
 import { CIPHERED, WARDED, applyDecode, copyOutcome, decodeNeeded, fits, markKnown, markRead } from "./book-rules.mjs";
-import { entryPages, typeOf } from "./entry-types.mjs";
+import { entryPages, entryWholeBook, typeOf } from "./entry-types.mjs";
 import { LANGUAGE, hasSpecialised, languageVariants, normalize } from "./names.mjs";
 
 const { DialogV2 } = foundry.applications.api;
@@ -64,9 +64,10 @@ async function decipher(item, entry, ctx) {
 
 async function readForbidden(item, entry, ctx) {
   const strength = corruptionLabel(ctx.book.forbidden);
+  // MG dostaje ostrzeżenie; gracz tylko potwierdza rozpoczęcie lektury
   const confirmed = await DialogV2.confirm({
-    window: { title: t("Page.ReadForbidden") },
-    content: `<p>${t("Page.ForbiddenConfirm", { strength: strength.toLocaleLowerCase() })}</p>`
+    window: { title: ctx.isGM ? t("Page.ReadForbidden") : t("Page.ReadUnread") },
+    content: `<p>${ctx.isGM ? t("Page.ForbiddenConfirm", { strength: strength.toLocaleLowerCase() }) : t("Page.UnreadConfirm")}</p>`
   });
   if (!confirmed) return;
   const test = await ctx.actor.corruptionDialog(strength.toLocaleLowerCase());
@@ -79,7 +80,7 @@ function copyTargets(item, entry, ctx) {
   return ctx.actor.items.filter((other) => {
     if (other.id === item.id || !isGrimoire(other)) return false;
     const book = readBook(other);
-    return fits(book, entry, entryPages) && addEntry(book, entry, type.same).added;
+    return fits(book, entry, entryPages, entryWholeBook) && addEntry(book, entry, type.same).added;
   });
 }
 
@@ -130,7 +131,12 @@ export function runEntryAction(actionId, item, entry, ctx) {
 export function lockedActions(state, ctx) {
   if (!ctx.actor?.isOwner) return [];
   if (state === CIPHERED) return [{ id: "decipher", label: t("Page.Decipher"), icon: "fa-key", primary: true }];
-  if (state === WARDED) return [{ id: "readForbidden", label: t("Page.ReadForbidden"), icon: "fa-skull", primary: true }];
+  // Gracz widzi zwykłe „Przeczytaj stronę”: o Zepsuciu dowie się dopiero z testu
+  if (state === WARDED) {
+    return [ctx.isGM
+      ? { id: "readForbidden", label: t("Page.ReadForbidden"), icon: "fa-skull", primary: true }
+      : { id: "readForbidden", label: t("Page.ReadUnread"), icon: "fa-book-open", glyph: "ui-status_read_only", primary: true }];
+  }
   return [];
 }
 

@@ -8,6 +8,8 @@
  *     cover: "#7a1f1f",              // kolor oprawy
  *     requirements: { readWrite, language, lore, carried },
  *     entries: [{ id, type, sourceUuid, data, flawed? }],   // type: "spell", "recipe"… (patrz entry-types.mjs)
+ *     slots: 4 | null,               // liczba zapisów (rytuał zajmuje wszystkie), null = bez limitu
+ *     hands: 2 | 1 | 0,              // ręce zajęte przez księgę trzymaną „przy sobie” (zwój: 0)
  *     pages: 40 | null,              // limit stron, null = bez limitu
  *     cipher: { difficulty, skill, slPerPage } | null,
  *     forbidden: "minor" | "moderate" | "major" | null,
@@ -28,6 +30,14 @@ export const FORM_BOOK = "book";
 export const FORM_SCROLL = "scroll";
 
 export const DEFAULT_COVER = "#6b2d1f";
+/** Zwykła księga magii mieści około 4 zaklęć albo jeden rytuał. */
+export const DEFAULT_SLOTS = 4;
+/** Księgę magii trzyma się w obu rękach; MG może to zmienić (1 ręka albo wcale). */
+export const DEFAULT_HANDS = 2;
+const HAND_CHOICES = [0, 1, 2];
+
+/** Liczba rąk z danych (0–2); brak albo błędna wartość daje domyślne 2. */
+export const readHands = (value) => (HAND_CHOICES.includes(Number(value)) && value !== null && value !== "" ? Number(value) : DEFAULT_HANDS);
 export const DEFAULT_LANGUAGE = "magick";
 
 const requirementDefaults = { readWrite: true, language: true, lore: true, carried: true };
@@ -43,7 +53,7 @@ export function setRequirementDefaults(values = {}) {
 export function emptyBook(form = FORM_BOOK) {
   return {
     form, language: DEFAULT_LANGUAGE, cover: DEFAULT_COVER, requirements: { ...requirementDefaults }, entries: [],
-    pages: null, cipher: null, forbidden: null, progress: {}, read: {}
+    slots: form === FORM_BOOK ? DEFAULT_SLOTS : null, hands: form === FORM_BOOK ? DEFAULT_HANDS : 0, pages: null, cipher: null, forbidden: null, progress: {}, read: {}
   };
 }
 
@@ -88,6 +98,9 @@ export function readBook(item) {
     cover: source.cover || DEFAULT_COVER,
     requirements: { ...requirementDefaults, ...source.requirements },
     entries,
+    // Księgi sprzed wprowadzenia zapisów (bez pola `slots`) zostają bez limitu
+    slots: form === FORM_BOOK ? positiveInteger(source.slots) : null,
+    hands: form === FORM_BOOK ? readHands(source.hands) : 0,
     pages: positiveInteger(source.pages),
     cipher: readCipher(source.cipher),
     forbidden: FORBIDDEN_STRENGTHS.includes(source.forbidden) ? source.forbidden : null,
