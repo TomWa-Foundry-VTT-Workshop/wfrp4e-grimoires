@@ -99,6 +99,8 @@ api.read(item);      // { form, language, cover, requirements, entries: [{ id, t
 api.registerEntryType(type); // add a new kind of entry
 ```
 
+Modules can also register a **book kind** (`registerBookKind` in `scripts/public.mjs`, contract in `scripts/book-kinds.mjs`): the same tome window with its own inventory section, Create Item entry, defaults, accepted entry types and look. A kind can work straight from the inventory without being held. Old World Alchemy uses this for alchemical books.
+
 An entry type decides how an entry looks and what it can do; the window, table of contents, reading requirements and editing are shared. The contract is described in `scripts/entry-types.mjs`. Modules of this series import `scripts/public.mjs` directly. Entries of a disabled module stay in the book and work again when it comes back.
 
 ## 🌐 Languages
@@ -121,6 +123,6 @@ Inspired by the grimoires in *Forien's Armoury* by Forien. Written from scratch 
 
 ## 📄 License
 
-MIT – see [LICENSE](LICENSE).
+MIT – see [LICENSE](LICENSE). The Polish-language fonts Grenze Gotisch (Omnibus-Type) and Almendra (Ana Sanfelippo) are under the SIL Open Font License; their licences are in `assets/fonts`.
 
 Unofficial fan content, not affiliated with or endorsed by Games Workshop or Cubicle 7. Warhammer and all related names are trademarks of Games Workshop Limited. The module ships no rulebook text or artwork; it works with the content you already own.

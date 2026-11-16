@@ -4,6 +4,7 @@
  */
 import { t } from "./constants.mjs";
 import { FORM_BOOK, addEntry, isGrimoire, readBook, writeBook } from "./grimoire-data.mjs";
+import { acceptsType } from "./book-kinds.mjs";
 import { CIPHERED, WARDED, applyDecode, copyOutcome, decodeNeeded, fits, markKnown, markRead } from "./book-rules.mjs";
 import { entryPages, entryWholeBook, typeOf } from "./entry-types.mjs";
 import { LANGUAGE, hasSpecialised, languageVariants, normalize } from "./names.mjs";
@@ -80,7 +81,7 @@ function copyTargets(item, entry, ctx) {
   return ctx.actor.items.filter((other) => {
     if (other.id === item.id || !isGrimoire(other)) return false;
     const book = readBook(other);
-    return fits(book, entry, entryPages, entryWholeBook) && addEntry(book, entry, type.same).added;
+    return acceptsType(book.kind, type.id) && fits(book, entry, entryPages, entryWholeBook) && addEntry(book, entry, type.same).added;
   });
 }
 

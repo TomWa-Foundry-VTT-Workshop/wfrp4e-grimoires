@@ -8,6 +8,14 @@
 @font-face { font-family: "GR Caslon"; font-style: italic; src: url("../../../systems/wfrp4e/fonts/ACaslonPro-Italic.otf") format("opentype"); font-display: swap; }
 @font-face { font-family: "GR Caslon"; font-weight: 600; src: url("../../../systems/wfrp4e/fonts/ACaslonPro-Semibold.otf") format("opentype"); font-display: swap; }
 
+/* Polskie litery: Nodesto i Caslon Antique ich nie mają (przeglądarka wstawiałaby glify z innego kroju),
+   więc w polskiej wersji (Foundry ustawia <html lang>) nagłówki i tytuły piszemy krojami z pełnym
+   alfabetem: Grenze Gotisch i Almendra (licencja SIL OFL, pliki w assets/fonts Grimoires/Underworld). */
+@font-face { font-family: "WFRP Grenze Gotisch"; src: url("../assets/fonts/GrenzeGotisch-PL.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "WFRP Almendra"; src: url("../assets/fonts/Almendra-Regular.ttf") format("truetype"); font-display: swap; }
+:root { --gr-font-display: "GR Nodesto", "Nodesto Caps Condensed"; --gr-font-title: "GR Caslon Antique", "Caslon Antique"; }
+:root:lang(pl) { --gr-font-display: "WFRP Grenze Gotisch"; --gr-font-title: "WFRP Almendra"; }
+
 /* ─── Paleta ─── */
 .wfrp4e-grimoires.gr-illuminated {
   --gr-paper: #f1e4c3;
@@ -16,8 +24,8 @@
   --gr-ink-soft: #5c4530;
   --gr-brass: #c9a24b;
   --gr-brass-deep: #7d5e1f;
-  --gr-display: "GR Nodesto", "Nodesto Caps Condensed", var(--font-header, serif);
-  --gr-title: "GR Caslon Antique", "Caslon Antique", serif;
+  --gr-display: var(--gr-font-display), var(--font-header, serif);
+  --gr-title: var(--gr-font-title), serif;
   --gr-body: "GR Caslon", "Adobe Caslon Pro", var(--font-body, serif);
   --gr-parchment: url("../../../systems/wfrp4e/ui/backgrounds/parchment-texture.webp");
   --grimoire-paper: var(--gr-paper);
@@ -809,17 +817,17 @@ body.gr-illuminated-chat .wfrp4e-grimoires-chat .gr-chat-marg { position: absolu
 body.gr-illuminated-chat .wfrp4e-grimoires-chat header { position: relative; display: flex; align-items: center; gap: 8px; padding-bottom: 4px; border-bottom: 2px solid var(--lore-ink); }
 body.gr-illuminated-chat .wfrp4e-grimoires-chat header img { display: none; }
 body.gr-illuminated-chat .wfrp4e-grimoires-chat .gr-chat-sigil { flex: 0 0 32px; width: 32px; height: 32px; color: var(--lore-ink); }
-body.gr-illuminated-chat .wfrp4e-grimoires-chat h3 { margin: 0; border: none; font-family: "GR Caslon Antique", serif; font-weight: bold; font-size: 1.2rem; color: #2a1d12; }
-body.gr-illuminated-chat .wfrp4e-grimoires-chat .lore { font-family: "GR Nodesto", serif; letter-spacing: 0.05em; color: var(--lore-ink); }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat h3 { margin: 0; border: none; font-family: var(--gr-font-title), serif; font-weight: bold; font-size: 1.2rem; color: #2a1d12; }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .lore { font-family: var(--gr-font-display), serif; letter-spacing: 0.05em; color: var(--lore-ink); }
 body.gr-illuminated-chat .wfrp4e-grimoires-chat .gr-chat-cn { position: relative; flex: 0 0 40px; width: 40px; height: 40px; margin-left: auto; color: var(--lore-ink); }
 body.gr-illuminated-chat .wfrp4e-grimoires-chat .gr-chat-cn > span { position: absolute; inset: 0; }
-body.gr-illuminated-chat .wfrp4e-grimoires-chat .gr-chat-cn b { position: absolute; inset: 0; display: grid; place-items: center; font-family: "GR Nodesto", serif; font-size: 1.05rem; color: #2a1d12; }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .gr-chat-cn b { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--gr-font-display), serif; font-size: 1.05rem; color: #2a1d12; }
 body.gr-illuminated-chat .wfrp4e-grimoires-chat .stats { position: relative; display: grid; gap: 2px; margin: 6px 0; }
-body.gr-illuminated-chat .wfrp4e-grimoires-chat .stats b { font-family: "GR Nodesto", serif; font-weight: normal; letter-spacing: 0.04em; color: var(--lore-ink); }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .stats b { font-family: var(--gr-font-display), serif; font-weight: normal; letter-spacing: 0.04em; color: var(--lore-ink); }
 body.gr-illuminated-chat .wfrp4e-grimoires-chat .gr-chat-icon { display: inline-block; width: 1em; height: 1em; margin-right: 4px; vertical-align: -0.15em; color: var(--lore-ink); }
 body.gr-illuminated-chat .wfrp4e-grimoires-chat .description { position: relative; line-height: 1.4; }
-body.gr-illuminated-chat .wfrp4e-grimoires-chat .description > p:first-of-type::first-letter { float: left; margin: 2px 6px 0 0; padding: 3px 5px 1px; font-family: "GR Nodesto", serif; font-size: 2.3em; line-height: 0.8; color: var(--lore-ink); border: 2px double var(--lore-ink); }
-body.gr-illuminated-chat .wfrp4e-grimoires-chat footer { margin-top: 4px; padding-top: 3px; font-family: "GR Nodesto", serif; letter-spacing: 0.04em; color: #5c4530; border-top: 1px dashed rgba(92, 69, 48, 0.5); }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat .description > p:first-of-type::first-letter { float: left; margin: 2px 6px 0 0; padding: 3px 5px 1px; font-family: var(--gr-font-display), serif; font-size: 2.3em; line-height: 0.8; color: var(--lore-ink); border: 2px double var(--lore-ink); }
+body.gr-illuminated-chat .wfrp4e-grimoires-chat footer { margin-top: 4px; padding-top: 3px; font-family: var(--gr-font-display), serif; letter-spacing: 0.04em; color: #5c4530; border-top: 1px dashed rgba(92, 69, 48, 0.5); }
 
 /* Jasna okładka: ciemny napis zamiast złotego */
 .wfrp4e-grimoires.gr-illuminated .grimoire.is-light-cover .grimoire-cover-bar { color: #2a1d12; }

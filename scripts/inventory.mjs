@@ -7,7 +7,8 @@
  *  - pozycja "Księga zaklęć" w oknie tworzenia przedmiotu.
  */
 import { MODULE_ID, t } from "./constants.mjs";
-import { FLAG_SCOPE, GRIMOIRE_FLAG, emptyBook, isGrimoire, isScroll } from "./grimoire-data.mjs";
+import { FLAG_SCOPE, GRIMOIRE_FLAG, bookKindOf, emptyBook, isGrimoire, isScroll } from "./grimoire-data.mjs";
+import { getBookKind, listBookKinds } from "./book-kinds.mjs";
 import { isCopy } from "./actors.mjs";
 import { GrimoireApp } from "./grimoire-app.mjs";
 import { ScrollApp } from "./scroll-app.mjs";
@@ -21,18 +22,31 @@ const CREATE_MARKER = "newGrimoire";
 const OPEN_AFTER_CREATE = `${MODULE_ID}.openBook`;
 
 /** Wygląd i rodzaj przedmiotu nowej księgi (bez nazwy i danych księgi). */
-const bookBase = () => ({
-  img: "icons/sundries/books/book-embossed-gold-red.webp",
+const bookBase = (kind = null) => ({
+  img: kind?.img ?? "icons/sundries/books/book-embossed-gold-red.webp",
   system: { trappingType: { value: "booksAndDocuments" }, encumbrance: { value: 1 } }
 });
 
-/** Tworzy nową księgę zaklęć na aktorze i otwiera ją. */
-export async function createGrimoire(actor) {
+/** Dział ekwipunku dla rodzaju księgi. */
+const kindSection = (kind) => `grimoires-${kind.id}`;
+
+/** Nazwa nowej księgi danego rodzaju. */
+const newBookName = (kind) => (kind ? game.i18n.localize(kind.newNameKey ?? kind.labelKey) : t("NewGrimoire"));
+
+/** Rodzaj księgi zarejestrowany przez włączony moduł (bez niego księga zostaje w zwykłym dziale ksiąg). */
+const registeredKind = (item) => getBookKind(bookKindOf(item));
+
+/**
+ * Tworzy nową księgę na aktorze i otwiera ją.
+ * @param {string|null} [kindId]  rodzaj księgi (book-kinds.mjs), domyślnie księga zaklęć
+ */
+export async function createGrimoire(actor, kindId = null) {
+  const kind = getBookKind(kindId);
   const [book] = await actor.createEmbeddedDocuments("Item", [{
     type: "trapping",
-    name: t("NewGrimoire"),
-    ...bookBase(),
-    flags: { [FLAG_SCOPE]: { [GRIMOIRE_FLAG]: emptyBook() } }
+    name: newBookName(kind),
+    ...bookBase(kind),
+    flags: { [FLAG_SCOPE]: { [GRIMOIRE_FLAG]: emptyBook(undefined, kind?.id) } }
   }]);
   if (book) GrimoireApp.open(book);
   return book;
@@ -46,20 +60,29 @@ function addToCreateDialog(element) {
   const select = element.querySelector('select[name="type"]');
   if (!select?.querySelector('option[value="trapping"]') || !select.querySelector('option[value="spell"]')) return;
 
-  const label = t("CreateType");
-  const option = new Option(label, "trapping");
-  option.dataset.grimoire = "true";
-  select.insertBefore(option, [...select.options].find((o) => o.label.localeCompare(label, game.i18n.lang) > 0) ?? null);
+  if (select.querySelector("option[data-grimoire]")) return;
+
+  // Księga zaklęć i każdy zarejestrowany rodzaj księgi; znacznik niesie rodzaj ("true" = księga zaklęć)
+  const choices = [
+    { label: t("CreateType"), value: "true" },
+    ...listBookKinds().map((kind) => ({ label: game.i18n.localize(kind.labelKey), value: kind.id }))
+  ];
+  for (const choice of choices) {
+    const option = new Option(choice.label, "trapping");
+    option.dataset.grimoire = choice.value;
+    select.insertBefore(option, [...select.options].find((o) => o.label.localeCompare(choice.label, game.i18n.lang) > 0) ?? null);
+  }
 
   const marker = document.createElement("input");
   Object.assign(marker, { type: "hidden", name: `flags.${FLAG_SCOPE}.${CREATE_MARKER}`, value: "true", disabled: true });
   select.after(marker);
 
   select.addEventListener("change", () => {
-    const chosen = Boolean(select.selectedOptions[0]?.dataset.grimoire);
+    const chosen = select.selectedOptions[0]?.dataset.grimoire;
     marker.disabled = !chosen;
     if (!chosen) return;
-    element.querySelector('[name="name"]').placeholder = t("NewGrimoire");
+    marker.value = chosen;
+    element.querySelector('[name="name"]').placeholder = newBookName(getBookKind(chosen));
     const hint = select.closest(".form-group").querySelector(".hint");
     if (hint) hint.textContent = t("CreateHint");
   });
@@ -85,12 +108,14 @@ function registerCreateDialog() {
   Hooks.on("renderDialogV2", (_app, element) => addToCreateDialog(element));
 
   Hooks.on("preCreateItem", (item, _data, options) => {
-    if (!item.flags[FLAG_SCOPE]?.[CREATE_MARKER]) return;
+    const marker = item.flags[FLAG_SCOPE]?.[CREATE_MARKER];
+    if (!marker) return;
+    const kind = getBookKind(String(marker));
     const unnamed = item.name === item.constructor.defaultName({ type: "trapping", parent: item.parent, pack: item.pack });
     item.updateSource({
-      ...bookBase(),
-      ...(unnamed ? { name: t("NewGrimoire") } : {}),
-      flags: { [FLAG_SCOPE]: { [GRIMOIRE_FLAG]: emptyBook(), [`-=${CREATE_MARKER}`]: null } }
+      ...bookBase(kind),
+      ...(unnamed ? { name: newBookName(kind) } : {}),
+      flags: { [FLAG_SCOPE]: { [GRIMOIRE_FLAG]: emptyBook(undefined, kind?.id), [`-=${CREATE_MARKER}`]: null } }
     });
     options[OPEN_AFTER_CREATE] = true;
   });
@@ -116,9 +141,21 @@ export function registerInventory() {
   // Dział w ekwipunku: księgi wyjęte z "Książek i dokumentów"
   Hooks.on("wfrp4e:constructInventory", (_sheet, categories, collapsed) => {
     const books = categories.booksAndDocuments?.items ?? [];
-    const grimoires = books.filter(isGrimoire);
+    const grimoires = books.filter((i) => isGrimoire(i) && !registeredKind(i));
     const scrolls = books.filter(isScroll);
     if (categories.booksAndDocuments) categories.booksAndDocuments.items = books.filter((i) => !isGrimoire(i) && !isScroll(i));
+    // Każdy rodzaj księgi ma własny dział; księgi, których się nie trzyma, nie mają przełącznika „przy sobie”
+    for (const kind of listBookKinds()) {
+      const key = kindSection(kind);
+      categories[key] = {
+        label: game.i18n.localize(kind.sectionKey ?? kind.labelKey),
+        items: books.filter((i) => isGrimoire(i) && registeredKind(i) === kind),
+        ...(kind.held === false ? {} : { toggle: true, toggleName: t("Inventory.Carried") }),
+        show: false,
+        collapsed: collapsed?.[key],
+        dataType: "trapping"
+      };
+    }
     categories[SECTION] = {
       label: t("Inventory.Section"),
       items: grimoires,
@@ -169,6 +206,9 @@ function decorateActorSheet(app, element) {
   if (!actor || !element) return;
 
   decorateSection(element, SECTION, "fa-book-open", t("Inventory.Open"), (item) => GrimoireApp.open(item), () => createGrimoire(actor));
+  for (const kind of listBookKinds()) {
+    decorateSection(element, kindSection(kind), kind.icon ?? "fa-book-open", t("Inventory.Open"), (item) => GrimoireApp.open(item), () => createGrimoire(actor, kind.id));
+  }
   decorateSection(element, SCROLL_SECTION, "fa-scroll", t("Inventory.OpenScroll"), (item) => ScrollApp.open(item), async () => {
     const scroll = await createScroll(actor);
     if (scroll) ScrollApp.open(scroll);

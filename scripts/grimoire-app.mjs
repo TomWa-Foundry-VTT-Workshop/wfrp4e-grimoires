@@ -5,6 +5,7 @@
 import { MODULE_ID, I18N, t } from "./constants.mjs";
 import { addEntry, groupEntries, illegible, moveEntry, readBook, removeEntry, writeBook } from "./grimoire-data.mjs";
 import { SPELL_TYPE } from "./spell-data.mjs";
+import { acceptsType, getBookKind, isHeldKind } from "./book-kinds.mjs";
 import { entryFromDrop, entryPages, entryWholeBook, typeOf } from "./entry-types.mjs";
 import { LANGUAGES, normalize } from "./names.mjs";
 import { requirementBadges } from "./requirements.mjs";
@@ -31,6 +32,18 @@ const flawText = (type) => `${t("Page.Flawed")}: ${type.flawNote?.() ?? ""}`;
 
 /** Rozkładówka spisu treści w wyglądzie iluminowanym (pozostałe rozkładówki to identyfikatory wpisów). */
 const CONTENTS = "contents";
+
+/**
+ * Motyw wpisu (`data-lore`): zaklęcie bierze szkołę z grupy, inne typy mogą podać własny przez `theme(entry)`
+ * (np. receptura – wiatr magii); reszta to magia bez szkoły.
+ */
+const entryTheme = (type, entry, groupKey) => {
+  if (type.id === SPELL_TYPE) return loreTheme(groupKey);
+  return type.theme ? loreTheme(type.theme(entry) ?? "arcane") : "arcane";
+};
+
+/** Sigil wpisu: motyw typu (np. wiatr receptury), inaczej sigil szkoły albo typu. */
+const entryGlyph = (type, entry, groupKey) => (type.theme ? loreGlyph(type.theme(entry) ?? "arcane") : loreGlyph(groupKey, type.id));
 
 /** Pole wyboru warunku w trybie edycji. */
 const REQUIREMENT_TOGGLES = ["readWrite", "language", "carried", "lore"];
@@ -142,7 +155,7 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
       folios.set(id, size > 1 ? `${nextFolio}–${nextFolio + size - 1}` : `${nextFolio}`);
       nextFolio += size;
     }
-    const rowTheme = (row) => (titleHidden(row) || row.type.id !== SPELL_TYPE ? "arcane" : loreTheme(row.type.group(row.entry).key));
+    const rowTheme = (row) => (titleHidden(row) ? "arcane" : entryTheme(row.type, row.entry, row.type.group(row.entry).key));
 
     const query = normalize(this.search);
     const visible = rows.filter((r) => !query || titleHidden(r) || normalize(r.type.name(r.entry)).includes(query));
@@ -164,8 +177,8 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
       const veiled = group.entries.every((entry) => titleHidden(byId.get(entry.id)));
       return {
         lore: group.key,
-        theme: veiled ? "arcane" : groupType === SPELL_TYPE ? loreTheme(group.key) : "arcane",
-        glyph: veiled ? "lore-arcane" : loreGlyph(group.key, groupType),
+        theme: veiled ? "arcane" : entryTheme(typeOf(group.entries[0]), group.entries[0], group.key),
+        glyph: veiled ? "lore-arcane" : entryGlyph(typeOf(group.entries[0]), group.entries[0], group.key),
         typeLabel: showType ? game.i18n.localize(labelKey) : null,
         label: hidden ? illegible(group.label) : group.label,
         entries: group.entries.map((entry) => {
@@ -207,9 +220,9 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
       const loreKey = type.group(entry).key;
       details = {
         id: entry.id,
-        theme: concealed || type.id !== SPELL_TYPE ? "arcane" : loreTheme(loreKey),
-        glyph: concealed ? "lore-arcane" : loreGlyph(loreKey, type.id),
-        marginalia: concealed ? "marg-arcane" : loreMarginalia(loreKey, type.id),
+        theme: concealed ? "arcane" : entryTheme(type, entry, loreKey),
+        glyph: concealed ? "lore-arcane" : entryGlyph(type, entry, loreKey),
+        marginalia: concealed ? "marg-arcane" : type.theme ? loreMarginalia(type.theme(entry) ?? "arcane") : loreMarginalia(loreKey, type.id),
         name: titleHidden(selected) ? illegible(name) : name,
         subtitle: titleHidden(selected) ? illegible(info.subtitle) : concealed ? "" : info.subtitle,
         stats: info.stats,
@@ -236,7 +249,9 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
       };
     }
 
-    const hasSpells = book.entries.some((entry) => entry.type === SPELL_TYPE) || book.entries.length === 0;
+    const kind = getBookKind(book.kind);
+    const held = isHeldKind(book.kind);
+    const hasSpells = acceptsType(book.kind, SPELL_TYPE) && (book.entries.some((entry) => entry.type === SPELL_TYPE) || book.entries.length === 0);
     const difficulties = Object.entries(game.wfrp4e?.config?.difficultyLabels ?? {}).map(([key, label]) => ({
       key, label: game.i18n.localize(label), selected: book.cipher?.difficulty === key
     }));
@@ -263,6 +278,8 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
       spread,
       book: this.book,
       cover: book.cover,
+      kind: book.kind ?? "",
+      kindLabel: kind ? game.i18n.localize(kind.labelKey) : "",
       lightCover: isLightCover(book.cover),
       // Ręce zajmowane przez księgę „przy sobie” (gdy postać jej wymaga przy sobie)
       handsLabel: book.hands ? t(`Badge.hands${book.hands}`) : "",
@@ -275,14 +292,14 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
         label: b.key === "language" ? t("Badge.language", { language: languageLabel(book.language) }) : t(`Badge.${b.key}`)
       })) : [],
       requirementToggles: REQUIREMENT_TOGGLES
-        .filter((key) => key !== "lore" || hasSpells)
+        .filter((key) => (key !== "lore" || hasSpells) && (key !== "carried" || held))
         .map((key) => ({ key, label: t(`Edit.Needs.${key}`), checked: book.requirements[key] })),
       slotsLabel: book.slots ? t("Badge.slots", { used: slotsUsed(book, entryWholeBook), total: book.slots }) : "",
       pagesLabel: book.pages ? t("Badge.pages", { used: pagesUsed(book, entryPages), total: book.pages }) : "",
       // Reguły księgi ustala MG: inaczej gracz sam zdjąłby szyfr ze swojej księgi
       rules: isGM ? {
         slots: book.slots ?? "",
-        hands: [2, 1, 0].map((value) => ({ value, label: t(`Edit.HandsOptions.${value}`), selected: book.hands === value })),
+        hands: held ? [2, 1, 0].map((value) => ({ value, label: t(`Edit.HandsOptions.${value}`), selected: book.hands === value })) : null,
         pages: book.pages ?? "",
         cipherOff: !book.cipher,
         difficulties,
@@ -292,7 +309,7 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
       } : null,
       actorName: actor?.name,
       carried: ctx.carried,
-      showCarried: Boolean(actor) && book.requirements.carried,
+      showCarried: Boolean(actor) && held && book.requirements.carried,
       groups,
       empty: rows.length === 0,
       details,
@@ -307,6 +324,8 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const html = this.element;
 
     html.classList.toggle("gr-illuminated", Boolean(context.illuminated));
+    // Rodzaj księgi (np. alchemiczna) – motyw okna dokłada moduł, który ten rodzaj zarejestrował
+    html.dataset.kind = context.kind;
     html.dataset.lore = context.illuminated && context.spread?.contents ? "" : context.details?.theme ?? "";
     applyAccessibility(html);
     if (context.illuminated) {
@@ -411,6 +430,9 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const found = await entryFromDrop(data);
     if (!found) return ui.notifications.warn(t("Notify.NotWritable"));
     const { entry, type } = found;
+    if (!acceptsType(this.data.kind, type.id)) {
+      return ui.notifications.warn(t("Notify.WrongKind", { kind: game.i18n.localize(getBookKind(this.data.kind)?.labelKey ?? "") }));
+    }
     if (type.canWrite && !type.canWrite()) return ui.notifications.warn(game.i18n.localize(type.writeDeniedKey ?? `${I18N}.Notify.NotWritable`));
     const noRoom = noRoomReason(this.data, entry, entryPages, entryWholeBook);
     if (noRoom === "whole") return ui.notifications.warn(t("Notify.WholeBook"));

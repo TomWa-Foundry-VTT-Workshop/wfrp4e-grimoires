@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0
+- Polish letters in the decorative fonts: Nodesto Caps and Caslon Antique have no ą, ę, ł, ś, ż…, so the browser filled them in from another typeface. When Foundry runs in Polish, headings now use Grenze Gotisch and titles Almendra, both with the full Polish alphabet (SIL Open Font License, files and licences in `assets/fonts`). English keeps the original fonts.
+- **Book kinds** for other modules (`registerBookKind`): a kind uses the same tome window but gets its own inventory section, entry in the Create Item dialog, default settings (cover, capacity, requirements), a list of entry types it accepts and its own look (`data-kind` on the window). A kind can be marked as not held: such a book works straight from the inventory, takes no hands, can't be equipped and has no "Carried" requirement. Old World Alchemy uses this for alchemical books.
+- Entry types can set their page theme (`theme(entry)`), so pages of other modules get a school's ink, sigil and marginalia.
+- New in the public API: `bookRoom(item, entry)` says whether an entry fits; `addEntryToBook` now respects the book's kind and capacity; `createBook(actor, kindId)`.
+
 ## 0.7.0
 - **Hands**: a carried tome is held in both hands by default; the GM can set one hand or none per book (Scriptorium, "Held in"). The book counts towards the character's equip points like a weapon: with the system setting "limit equipped weapons", a character can't take up the book with their hands full or draw a weapon while the book takes them, and a message says what holds their hands. The header shows "Carried · 2 hands". Tomes made earlier are also held in both hands.
 - **Forbidden pages stay secret from players**: a player sees a forbidden page as simply unread (a plain seal, "Read the page", a neutral confirmation) and learns about the Corruption only from the test when they start reading. The GM still sees the forbidden mark, the warning and the chains.

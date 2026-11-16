@@ -7,7 +7,8 @@
  * (domyślnie 2), więc wlicza się do tego samego limitu: z księgą w obu rękach nie dobędziesz broni i odwrotnie.
  */
 import { t } from "./constants.mjs";
-import { isGrimoire, readBook } from "./grimoire-data.mjs";
+import { bookKindOf, isGrimoire, readBook } from "./grimoire-data.mjs";
+import { getBookKind, isHeldKind } from "./book-kinds.mjs";
 
 /** Ręce zajmowane przez trzymaną księgę (0 dla innych przedmiotów). */
 export function bookHands(item) {
@@ -45,6 +46,17 @@ function heldItems(actor, except) {
 }
 
 export function registerHands() {
+  // Księgi, której się nie trzyma (np. alchemicznej), nie da się założyć: działa z samego ekwipunku
+  Hooks.on("preUpdateItem", (item, changes, _options, userId) => {
+    if (!foundry.utils.getProperty(changes, "system.equipped.value") || !isGrimoire(item)) return;
+    const kind = bookKindOf(item);
+    if (isHeldKind(kind)) return;
+    if (userId === game.user.id) {
+      ui.notifications.info(t("Hands.NotHeld", { name: item.name, kind: game.i18n.localize(getBookKind(kind)?.labelKey ?? "") }));
+    }
+    return false;
+  });
+
   // Księga wlicza się do punktów wyposażenia jak broń
   const proto = CONFIG.Item.dataModels.trapping?.prototype;
   const original = proto && findGetter(proto, "equipPoints");

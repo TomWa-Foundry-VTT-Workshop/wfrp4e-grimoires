@@ -121,6 +121,7 @@
       "guilder": "Guilder"
     },
     "Notify": {
+      "WrongKind": "This entry can’t be written in this book ({kind}).",
       "AlreadyInBook": "{name} is already in this tome.",
       "NotWritable": "This can't be written here.",
       "NoRoom": "Not enough pages: this needs {needed}, {free} free.",
@@ -247,6 +248,7 @@
       "CipherProgress": "Worked out {done} of {needed} SL"
     },
     "Hands": {
+      "NotHeld": "{name} ({kind}) works from the inventory and isn’t held in the hands.",
       "Full": "Not enough free hands for {name}: it needs {need}, {free} free (held: {held})."
     }
   }

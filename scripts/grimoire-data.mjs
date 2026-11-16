@@ -14,12 +14,15 @@
  *     cipher: { difficulty, skill, slPerPage } | null,
  *     forbidden: "minor" | "moderate" | "major" | null,
  *     progress: { [actorId]: { [entryId]: PS } },   // odszyfrowywanie
- *     read: { [actorId]: [entryId] }                // przeczytane strony zakazane
+ *     read: { [actorId]: [entryId] },               // przeczytane strony zakazane
+ *     kind: "alchemy" | null         // rodzaj księgi z innego modułu (book-kinds.mjs), null = księga zaklęć
  *   }
  *
  * Starsze dane (`spells` w księdze, osobna flaga `scroll` dla zwoju) są rozpoznawane przy odczycie
  * i zapisywane w nowej postaci przy pierwszej zmianie, dlatego nie ma osobnej migracji świata.
  */
+
+import { getBookKind, isHeldKind } from "./book-kinds.mjs";
 
 export const FLAG_SCOPE = "wfrp4e-grimoires";
 export const GRIMOIRE_FLAG = "grimoire";
@@ -49,12 +52,26 @@ export function setRequirementDefaults(values = {}) {
   }
 }
 
-/** Domyślne dane nowej księgi albo zwoju. */
-export function emptyBook(form = FORM_BOOK) {
-  return {
+/**
+ * Domyślne dane nowej księgi albo zwoju.
+ * @param {string|null} [kindId]  rodzaj księgi (book-kinds.mjs); jego `defaults` nadpisują pola
+ */
+export function emptyBook(form = FORM_BOOK, kindId = null) {
+  const book = {
     form, language: DEFAULT_LANGUAGE, cover: DEFAULT_COVER, requirements: { ...requirementDefaults }, entries: [],
-    slots: form === FORM_BOOK ? DEFAULT_SLOTS : null, hands: form === FORM_BOOK ? DEFAULT_HANDS : 0, pages: null, cipher: null, forbidden: null, progress: {}, read: {}
+    slots: form === FORM_BOOK ? DEFAULT_SLOTS : null, hands: form === FORM_BOOK ? DEFAULT_HANDS : 0, pages: null, cipher: null, forbidden: null, progress: {}, read: {},
+    kind: null
   };
+  const kind = form === FORM_BOOK ? getBookKind(kindId) : null;
+  if (!kind) return book;
+  const { requirements, ...defaults } = kind.defaults ?? {};
+  return withKindRules({ ...book, ...defaults, requirements: { ...book.requirements, ...requirements }, kind: kind.id });
+}
+
+/** Księgi, której się nie trzyma, nie zakłada się: nie zajmuje rąk i nie musi być „przy sobie”. */
+function withKindRules(book) {
+  if (isHeldKind(book.kind)) return book;
+  return { ...book, hands: 0, requirements: { ...book.requirements, carried: false } };
 }
 
 const FORBIDDEN_STRENGTHS = ["minor", "moderate", "major"];
@@ -79,6 +96,12 @@ export const isBook = (item) => formOf(item) !== null;
 export const isGrimoire = (item) => formOf(item) === FORM_BOOK;
 export const isScroll = (item) => formOf(item) === FORM_SCROLL;
 
+/** Rodzaj księgi zapisany w przedmiocie (bez sprawdzania, czy moduł rodzaju jest włączony). */
+export const bookKindOf = (item) => {
+  const raw = flagsOf(item)?.[GRIMOIRE_FLAG];
+  return raw && raw.form !== FORM_SCROLL && typeof raw.kind === "string" && raw.kind ? raw.kind : null;
+};
+
 /** Wpis z danych przedmiotu; starsze wpisy nie mają typu i są zaklęciami. */
 const typedEntry = (entry) => ({ ...entry, type: entry.type ?? "spell" });
 const validEntries = (list) => (Array.isArray(list) ? list.filter((e) => e?.id && e?.data).map(typedEntry) : []);
@@ -92,7 +115,7 @@ export function readBook(item) {
   const legacyScroll = !raw ? flags[LEGACY_SCROLL_FLAG] : null;
   const source = raw ?? legacyScroll;
   const entries = raw ? validEntries(raw.entries ?? raw.spells) : validEntries(legacyScroll.spell ? [legacyScroll.spell] : []);
-  return {
+  const book = {
     form,
     language: source.language || DEFAULT_LANGUAGE,
     cover: source.cover || DEFAULT_COVER,
@@ -105,8 +128,10 @@ export function readBook(item) {
     cipher: readCipher(source.cipher),
     forbidden: FORBIDDEN_STRENGTHS.includes(source.forbidden) ? source.forbidden : null,
     progress: source.progress ?? {},
-    read: source.read ?? {}
+    read: source.read ?? {},
+    kind: form === FORM_BOOK && typeof source.kind === "string" && source.kind ? source.kind : null
   };
+  return withKindRules(book);
 }
 
 /** Dane do `item.update` zapisujące księgę w aktualnej postaci (usuwa stare pola). */

@@ -99,6 +99,8 @@ api.read(item);      // { form, language, cover, requirements, entries: [{ id, t
 api.registerEntryType(type); // nowy rodzaj wpisów
 ```
 
+Moduły mogą też rejestrować **rodzaj księgi** (`registerBookKind` w `scripts/public.mjs`, opis w `scripts/book-kinds.mjs`): to samo okno księgi z własnym działem w ekwipunku, pozycją w oknie tworzenia przedmiotu, ustawieniami domyślnymi, listą przyjmowanych wpisów i wyglądem. Rodzaj może działać z samego ekwipunku, bez trzymania w rękach. Korzysta z tego Alchemia Starego Świata (księgi alchemiczne).
+
 Typ wpisu decyduje o wyglądzie i działaniu wpisu; okno, spis treści, warunki czytania i edycja są wspólne. Kontrakt opisuje `scripts/entry-types.mjs`. Moduły tej serii importują bezpośrednio `scripts/public.mjs`. Wpisy wyłączonego modułu zostają w księdze i wracają do działania po jego ponownym włączeniu.
 
 ## 🌐 Języki
@@ -121,6 +123,6 @@ Inspiracja: księgi z *Forien's Armoury* autorstwa Foriena. Napisany od zera dla
 
 ## 📄 Licencja
 
-MIT – zobacz [LICENSE](LICENSE).
+MIT – zobacz [LICENSE](LICENSE). Czcionki polskiej wersji, Grenze Gotisch (Omnibus-Type) i Almendra (Ana Sanfelippo), są na licencji SIL Open Font License; ich licencje leżą w `assets/fonts`.
 
 Nieoficjalna twórczość fanowska, niezwiązana z Games Workshop ani Cubicle 7 i przez nie niepopierana. Warhammer i powiązane nazwy są znakami towarowymi Games Workshop Limited. Moduł nie zawiera tekstów ani grafik z podręczników – działa z treściami, które już posiadasz.

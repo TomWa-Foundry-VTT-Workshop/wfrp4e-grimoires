@@ -61,11 +61,13 @@
           <label data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Edit.SlotsHint'}}">{{localize "WFRP4E_GRIMOIRE.Edit.Slots"}}
             <input type="number" name="slots" min="1" value="{{rules.slots}}" placeholder="∞">
           </label>
-          <label data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Edit.HandsHint'}}">{{localize "WFRP4E_GRIMOIRE.Edit.Hands"}}
-            <select name="hands">
-              {{#each rules.hands}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-            </select>
-          </label>
+          {{#if rules.hands}}
+            <label data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Edit.HandsHint'}}">{{localize "WFRP4E_GRIMOIRE.Edit.Hands"}}
+              <select name="hands">
+                {{#each rules.hands}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+              </select>
+            </label>
+          {{/if}}
           <label>{{localize "WFRP4E_GRIMOIRE.Edit.Pages"}}
             <input type="number" name="pages" min="1" value="{{rules.pages}}" placeholder="∞">
           </label>

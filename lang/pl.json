@@ -121,11 +121,12 @@
       "guilder": "Gildii"
     },
     "Notify": {
+      "WrongKind": "Tego wpisu nie można zapisać w tej księdze ({kind}).",
       "AlreadyInBook": "{name} jest już w tej księdze.",
       "NotWritable": "Tego nie da się tu zapisać.",
       "NoRoom": "Za mało stron: potrzeba {needed}, wolnych {free}.",
       "WholeBook": "Rytuał zajmuje całą księgę: można go wpisać tylko do pustej, a po nim nic więcej się nie zmieści.",
-      "NoSlot": "Księga jest pełna ({total} zapisy)."
+      "NoSlot": "Księga jest pełna (zapisy: {total})."
     },
     "Settings": {
       "ConsumeOnFailureName": "Nieudany test zużywa zwój",
@@ -247,6 +248,7 @@
       "CipherProgress": "Odczytano {done} z {needed} PS"
     },
     "Hands": {
+      "NotHeld": "{name} to {kind}: działa z samego ekwipunku i nie trzyma się jej w rękach.",
       "Full": "Za mało wolnych rąk na {name}: potrzeba {need}, wolne {free} (zajmują je: {held})."
     }
   }
