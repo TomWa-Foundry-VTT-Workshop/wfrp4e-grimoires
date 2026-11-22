@@ -45,6 +45,7 @@
     "Note": {
       "known": "Znasz już to zaklęcie – księga nie jest potrzebna, by je rzucić.",
       "castable": "Możesz rzucić to zaklęcie, póki masz księgę przy sobie. Jest na karcie jako niezapamiętane, z ikoną księgi – do czasu zapamiętania ma podwójny PM.",
+      "castableCV": "Możesz rzucić to zaklęcie, póki księga jest założona („przy sobie”). Jest na karcie z ikoną księgi: rzucasz je testem szkoły jak inne zaklęcia. Zapamiętaj je, by rzucać bez księgi.",
       "readOnly": "Nie znasz Tradycji: {lore} – możesz tylko przeczytać to zaklęcie.",
       "unreadable": "Nie potrafisz przeczytać tej księgi.",
       "none": "Daj księgę postaci, aby rzucać z niej zaklęcia.",
@@ -114,12 +115,12 @@
       "Denied": "MG nie zezwolił na zapamiętanie tego zaklęcia.",
       "NoGM": "Do zatwierdzenia zapamiętania zaklęcia potrzebny jest MG online.",
       "Failed": "Zapamiętanie zaklęcia nie powiodło się. Szczegóły w konsoli (F12).",
-      "TitleCopy": "Przepisanie zaklęcia na kartę",
-      "ConfirmCopy": "{user} chce przepisać zaklęcie <strong>{spell}</strong> z księgi na kartę postaci {actor} (ma {current} PD). Zezwolić?",
-      "LearnedCopy": "Zaklęcie <strong>{spell}</strong> z księgi {book} trafia na kartę postaci {actor}.",
-      "DeniedCopy": "MG nie zezwolił na przepisanie tego zaklęcia na kartę.",
-      "NoGMCopy": "Do zatwierdzenia przepisania zaklęcia na kartę potrzebny jest MG online.",
-      "FailedCopy": "Przepisanie zaklęcia na kartę nie powiodło się. Szczegóły w konsoli (F12)."
+      "TitleCopy": "Zapamiętanie zaklęcia",
+      "ConfirmCopy": "{user} prosi, by postać {actor} zapamiętała zaklęcie <strong>{spell}</strong> i rzucała je bez księgi. Zezwolić?",
+      "LearnedCopy": "{actor}: zaklęcie <strong>{spell}</strong> z księgi {book} zapamiętane – można je rzucać bez księgi.",
+      "DeniedCopy": "MG nie zezwolił na zapamiętanie tego zaklęcia.",
+      "NoGMCopy": "Do zatwierdzenia zapamiętania zaklęcia potrzebny jest MG online.",
+      "FailedCopy": "Zapamiętanie zaklęcia nie powiodło się. Szczegóły w konsoli (F12)."
     },
     "Languages": {
       "magick": "Magiczny",

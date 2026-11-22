@@ -67,7 +67,7 @@ async function bookDetails(entry, status, ctx) {
       stat("Range", s.range), stat("Target", s.target), stat("Duration", s.duration)
     ],
     description: await TextEditorImpl().enrichHTML(s.description, { relativeTo: ctx.item, secrets: ctx.isGM }),
-    note: fromBook && !ctx.carried && ctx.actor ? t("Note.notCarried") : t(`Note.${status}`, { lore: loresText(s) }),
+    note: fromBook && !ctx.carried && ctx.actor ? t("Note.notCarried") : term(`Note.${status}`, { lore: loresText(s) }),
     actions
   };
 }

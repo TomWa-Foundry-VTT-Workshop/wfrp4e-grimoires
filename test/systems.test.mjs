@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { SYSTEMS, activeSystem, supports, systemRequirements, term, useSystem } from "../scripts/systems/index.mjs";
 import { LORE_THEMES } from "../scripts/systems/whtow.mjs";
-import { FLAW_CN_PENALTY, flawSpell, spellLores, spellPages, spellSummary } from "../scripts/spell-data.mjs";
+import { FLAW_CN_PENALTY, effectiveCN, flawSpell, spellLores, spellPages, spellSummary } from "../scripts/spell-data.mjs";
 import { quantityPath, scrollCount } from "../scripts/scroll-data.mjs";
 import { copyOutcome } from "../scripts/book-rules.mjs";
 import { loreGlyph, loreTheme } from "../scripts/ui.mjs";
@@ -55,11 +55,27 @@ describe("rejestr systemów", () => {
 });
 
 describe("The Old World", () => {
-  it("nie rzuca z księgi, nie zapamiętuje i nie ma rąk", () => {
+  it("rzuca z księgi przez kopie na karcie, bez pola zapamiętania, splatania i rąk", () => {
     useSystem("whtow");
-    for (const name of ["copies", "castFromBook", "channel", "memorize", "scrollCast", "hands", "readWrite", "language", "corruption"]) {
+    for (const name of ["copies", "castFromBook"]) expect(supports(name)).toBe(true);
+    for (const name of ["channel", "memorize", "scrollCast", "hands", "readWrite", "language", "corruption"]) {
       expect(supports(name)).toBe(false);
     }
+  });
+
+  it("rzucanie z księgi nie podwaja CV (w WFRP PM ×2)", () => {
+    const summary = { cn: 6, isPetty: false, isRitual: false };
+    expect(effectiveCN(summary, "castable")).toBe(12);
+    useSystem("whtow");
+    expect(effectiveCN(summary, "castable")).toBe(6);
+    expect(effectiveCN(summary, "unmemorized")).toBe(6);
+  });
+
+  it("rzut z księgi: test szkoły z kopią z karty", async () => {
+    const calls = [];
+    const actor = { setupCastingTest: async (data) => (calls.push(data), { ok: true }) };
+    expect(await SYSTEMS.whtow.cast(actor, { id: "kopia" })).toEqual({ ok: true });
+    expect(calls).toEqual([{ spell: "kopia" }]);
   });
 
   it("wyłącza warunki czytania i języka, zostawia pozostałe", () => {
@@ -136,6 +152,7 @@ describe("The Old World", () => {
     expect(term("Page.FlawSpell")).toBe("WFRP4E_GRIMOIRE.Page.FlawSpellCV");
     expect(term("Page.Note.ciphered")).toBe("WFRP4E_GRIMOIRE.Page.Note.cipheredPool");
     expect(term("Page.Copy")).toBe("WFRP4E_GRIMOIRE.Page.Copy");
+    expect(term("Note.castable")).toBe("WFRP4E_GRIMOIRE.Note.castableCV");
   });
 });
 

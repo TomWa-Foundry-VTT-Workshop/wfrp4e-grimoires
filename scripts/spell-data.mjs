@@ -3,7 +3,7 @@
  * Pola zaklęcia czyta adapter systemu (scripts/systems), domyślnie aktywnego.
  */
 import { FLAG_SCOPE } from "./grimoire-data.mjs";
-import { activeSystem } from "./systems/index.mjs";
+import { activeSystem, supports } from "./systems/index.mjs";
 
 export const SPELL_TYPE = "spell";
 
@@ -64,9 +64,10 @@ export const FROM_BOOK_STATUSES = ["castable", "unmemorized"];
 
 /**
  * Poziom Mocy tak, jak liczy go system dla postaci: zaklęcie niezapamiętane (rzucane z księgi)
- * ma PM ×2, a niezapamiętany rytuał ×4. Magia prosta nie korzysta z ksiąg.
+ * ma PM ×2, a niezapamiętany rytuał ×4. Magia prosta nie korzysta z ksiąg. Systemy bez
+ * zapamiętywania (The Old World) nie podwajają wartości przy rzucaniu z księgi.
  */
 export function effectiveCN(summary, status) {
-  if (!FROM_BOOK_STATUSES.includes(status) || summary.isPetty) return summary.cn;
+  if (!FROM_BOOK_STATUSES.includes(status) || summary.isPetty || !supports("memorize")) return summary.cn;
   return summary.cn * (summary.isRitual ? 4 : 2);
 }

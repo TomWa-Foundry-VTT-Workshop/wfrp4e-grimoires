@@ -6,8 +6,9 @@
  * przy sobie wpisuje na kartę niezapamiętane kopie zaklęć, które postać może z niej rzucać.
  * Zapamiętanie (ustawienie M) kosztuje PD wyliczane przez system jego własnym oknem.
  *
- * W systemach bez rzucania z księgi (The Old World) nie ma kopii: postać za zgodą MG przepisuje
- * zaklęcie na kartę. Co system obsługuje, mówi jego adapter (scripts/systems).
+ * W systemach bez pola „zapamiętane” (The Old World) kopia też jest na karcie, a zapamiętanie
+ * za zgodą MG zamienia ją we własne zaklęcie postaci. Co system obsługuje, mówi jego adapter
+ * (scripts/systems).
  */
 import { MODULE_ID, t, log } from "./constants.mjs";
 import { COPY_FLAG, FORM_BOOK, entriesOfType, isGrimoire, readBook } from "./grimoire-data.mjs";
@@ -130,7 +131,7 @@ export async function syncCopies(book) {
   }
   syncing.add(key);
   try {
-    // Bez rzucania z księgi (np. The Old World) kopii nie ma – zostaje tylko sprzątanie starych
+    // Bez rzucania z księgi kopii nie ma – zostaje tylko sprzątanie starych
     const wanted = supports("copies") && isCarried(book) ? entryStatuses(book).filter((s) => s.status === "castable").map((s) => s.entry) : [];
     const wantedIds = new Set(wanted.map((e) => e.id));
     const existing = copiesOf(actor, book.id);
@@ -139,7 +140,7 @@ export async function syncCopies(book) {
     const toDelete = existing.filter((i) => !wantedIds.has(i.flags[MODULE_ID][COPY_FLAG].entryId)).map((i) => i.id);
     const toCreate = wanted.filter((e) => !existingIds.has(e.id)).map((entry) => {
       const data = foundry.utils.deepClone(entry.data);
-      foundry.utils.setProperty(data, "system.memorized.value", false);
+      if (supports("memorize")) foundry.utils.setProperty(data, "system.memorized.value", false);
       foundry.utils.setProperty(data, `flags.${MODULE_ID}.${COPY_FLAG}`, { bookId: book.id, entryId: entry.id });
       return data;
     });
@@ -243,10 +244,15 @@ async function memorize(book, entry) {
   });
 }
 
-/** Przepisanie zaklęcia z księgi na kartę postaci (systemy bez zapamiętywania). */
+/**
+ * Zapamiętanie w systemach bez pola „zapamiętane”: kopia z księgi staje się własnym zaklęciem
+ * postaci (zostaje po odłożeniu księgi), a bez kopii zaklęcie trafia na kartę z danych księgi.
+ */
 async function writeOnSheet(book, entry) {
   const actor = book.actor;
-  if (!ownedSpell(actor, entry)) {
+  const copy = copiesOf(actor, book.id).find((i) => i.flags[MODULE_ID][COPY_FLAG].entryId === entry.id);
+  if (copy) await copy.update({ [`flags.${MODULE_ID}.-=${COPY_FLAG}`]: null });
+  else if (!ownedSpell(actor, entry)) {
     const data = foundry.utils.deepClone(entry.data);
     if (data.flags?.[MODULE_ID]) delete data.flags[MODULE_ID][COPY_FLAG];
     await actor.createEmbeddedDocuments("Item", [data]);

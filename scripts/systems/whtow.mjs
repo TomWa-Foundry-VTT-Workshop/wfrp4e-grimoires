@@ -1,11 +1,17 @@
 /**
  * Warhammer: The Old World (system "whtow").
  *
- * W tym systemie zaklęcie rzuca się tylko z karty: test szkoły (Siła Woli) zbiera moc, a zaklęcie
- * wychodzi, gdy moc dorówna jego Wartości Rzucania (CV). Zaklęcia nie kosztują PD i nie ma zapamiętywania.
- * Księga służy więc do przechowywania i przekazywania zaklęć: postać, która ją przeczyta, może
- * za zgodą MG przepisać zaklęcie na kartę. Nie ma talentu Czytanie/Pisanie, umiejętności Język,
- * punktów wyposażenia ani testu Zepsucia przy lekturze, więc te warunki są wyłączone.
+ * Rzucanie: test szkoły (Siła Woli) zbiera moc, a przycisk „Cast Spell” na czacie pozwala wybrać
+ * zaklęcie tej szkoły z karty, którego Wartość Rzucania (CV) moc już osiąga.
+ *
+ * Zasady (Player's Guide: Formalise Spell, Memorise Spell): czarodziej zapisuje zaklęcia w swoim
+ * grimuarze i rzuca je z niego; zapamiętane zaklęcie nie potrzebuje już księgi. Dlatego księga
+ * założona („przy sobie”) wpisuje na kartę kopie zaklęć szkół, które postać zna – system rzuca je
+ * jak każde inne. Zapamiętanie (za zgodą MG) zamienia kopię we własne zaklęcie postaci. System nie
+ * ma pola „zapamiętane” ani podwajania CV, więc kopia ma zwykłe CV.
+ *
+ * Nie ma talentu Czytanie/Pisanie, umiejętności Język, punktów wyposażenia ani testu Zepsucia
+ * przy lekturze, więc te warunki są wyłączone. Zwojów nie rzuca się bezpośrednio.
  */
 import { t } from "../constants.mjs";
 import { normalize } from "../names.mjs";
@@ -51,7 +57,7 @@ export default {
   id: "whtow",
   inventory: "dom",
   features: {
-    copies: false, castFromBook: false, channel: false, memorize: false, scrollCast: false,
+    copies: true, castFromBook: true, channel: false, memorize: false, scrollCast: false,
     hands: false, readWrite: false, language: false, corruption: false
   },
 
@@ -83,7 +89,8 @@ export default {
 
   xp: (actor) => actor?.system?.xp?.available ?? actor?.system?.xp?.total ?? 0,
 
-  cast: async () => null,
+  /** Test szkoły z zaklęciem z karty (kopią z księgi); samo zaklęcie wybiera się potem na czacie. */
+  cast: async (actor, spell) => (await actor.setupCastingTest({ spell: spell.id })) ?? null,
   castScroll: async () => null,
 
   // Testy to pule kości bez stopni trudności: szyfr jest albo go nie ma
@@ -108,13 +115,14 @@ export default {
     return { success, sl: success ? Number(test.result?.successes) || 0 : 0, fumble: false };
   },
 
-  // Sukcesy zamiast PS i WR zamiast PM
+  // Sukcesy zamiast PS, WR zamiast PM, kopia z księgi bez podwojonego CV
   terms: {
     "Edit.CipherSL": "Edit.CipherSuccesses",
     "Edit.CipherSkillDefault": "Edit.CipherSkillRecall",
     "Page.Note.ciphered": "Page.Note.cipheredPool",
     "Page.DecipherProgress": "Page.DecipherProgressPool",
-    "Page.FlawSpell": "Page.FlawSpellCV"
+    "Page.FlawSpell": "Page.FlawSpellCV",
+    "Note.castable": "Note.castableCV"
   },
 
   corruptionKey: () => null,

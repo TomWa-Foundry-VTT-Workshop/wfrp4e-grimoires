@@ -45,6 +45,7 @@
     "Note": {
       "known": "You already know this spell; you don't need the grimoire to cast it.",
       "castable": "You can cast this spell while you carry the grimoire. It is on your sheet as a non-memorised spell with a book icon; its CN is doubled until you memorise it.",
+      "castableCV": "You can cast this spell while the grimoire is equipped (carried). It is on your sheet with a book icon: cast it with a lore test like your other spells. Memorise it to cast it without the book.",
       "readOnly": "You don't know the Lore of {lore}, so you can only read this spell.",
       "unreadable": "You can't read this grimoire.",
       "none": "Give the grimoire to a character to cast from it.",
@@ -114,12 +115,12 @@
       "Denied": "The GM did not allow memorising this spell.",
       "NoGM": "A GM must be online to approve memorising a spell.",
       "Failed": "Memorising the spell failed. See the console (F12) for details.",
-      "TitleCopy": "Copy a spell onto the sheet",
-      "ConfirmCopy": "{user} wants {actor} to copy <strong>{spell}</strong> from the tome onto their sheet (has {current} XP). Allow?",
-      "LearnedCopy": "{actor} copied <strong>{spell}</strong> from {book} onto their sheet.",
-      "DeniedCopy": "The GM did not allow copying this spell onto the sheet.",
-      "NoGMCopy": "A GM must be online to approve copying a spell onto the sheet.",
-      "FailedCopy": "Copying the spell onto the sheet failed. See the console (F12) for details."
+      "TitleCopy": "Memorise a spell",
+      "ConfirmCopy": "{user} asks for {actor} to memorise <strong>{spell}</strong> and cast it without the grimoire. Allow?",
+      "LearnedCopy": "{actor} memorised <strong>{spell}</strong> from {book} and can cast it without the grimoire.",
+      "DeniedCopy": "The GM did not allow memorising this spell.",
+      "NoGMCopy": "A GM must be online to approve memorising a spell.",
+      "FailedCopy": "Memorising the spell failed. See the console (F12) for details."
     },
     "Languages": {
       "magick": "Magick",
