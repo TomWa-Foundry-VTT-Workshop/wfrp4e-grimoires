@@ -2,7 +2,7 @@
   "id": "wfrp4e-grimoires",
   "title": "WFRP4e – Grimoires",
   "description": "Spellbooks for WFRP4e 10.x and Warhammer: The Old World: a separate inventory section and an open-book window listing the spells by Lore, with full spell details, casting from the book (WFRP) and learning spells with GM approval.",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "compatibility": {
     "minimum": "14",
     "verified": "14",

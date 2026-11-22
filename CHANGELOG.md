@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.1
+- The Create Item type is now called **Magic Grimoire** (Polish: **Księga Zaklęć**).
+- New English screenshots in the README with placeholder spell text, plus views of the character sheet and The Old World.
+
 ## 0.9.0
 - **Warhammer: The Old World**: the module now works in the `whtow` system too. Tomes and scrolls get their own sections under Trappings, the tome window shows the spell's Casting Value, the system's range, target and duration and the Lore in a matching school look. As in the rules (Formalise Spell, Memorise Spell), a wizard casts from their grimoire: an equipped tome puts copies of its spells from Lores the character knows onto the sheet, cast through the system's Lore test without doubling the Casting Value, and **Memorise** (with GM approval) makes a copy the character's own spell. Requirements the system has no rules for (literacy, language, hands, Corruption on reading) are off, ciphers count successes on a skill test (Recall by default), and scrolls keep a spell's text without casting.
 - The repository moved to the TomWa-Foundry-VTT-Workshop organisation on GitHub. Old links redirect, so installed copies keep updating.
