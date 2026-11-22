@@ -79,18 +79,20 @@
           </label>
           {{#unless rules.cipherOff}}
             <label>{{localize "WFRP4E_GRIMOIRE.Edit.CipherSkill"}}
-              <input type="text" name="cipherSkill" value="{{rules.cipherSkill}}" placeholder="{{localize 'WFRP4E_GRIMOIRE.Edit.CipherSkillDefault'}}">
+              <input type="text" name="cipherSkill" value="{{rules.cipherSkill}}" placeholder="{{rules.cipherSkillHint}}">
             </label>
-            <label>{{localize "WFRP4E_GRIMOIRE.Edit.CipherSL"}}
+            <label>{{rules.cipherSLLabel}}
               <input type="number" name="cipherSL" min="1" value="{{rules.cipherSL}}">
             </label>
           {{/unless}}
+          {{#if rules.forbidden}}
           <label>{{localize "WFRP4E_GRIMOIRE.Edit.Forbidden"}}
             <select name="forbidden">
               <option value="">{{localize "WFRP4E_GRIMOIRE.Edit.ForbiddenNone"}}</option>
               {{#each rules.forbidden}}<option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
             </select>
           </label>
+          {{/if}}
         </div>
       {{/if}}
       <span class="grimoire-drop-hint"><i class="fa-solid fa-hand-pointer"></i> {{localize "WFRP4E_GRIMOIRE.Edit.DropHint"}}</span>

@@ -7,14 +7,17 @@ import { FORM_BOOK, addEntry, isGrimoire, readBook, writeBook } from "./grimoire
 import { acceptsType } from "./book-kinds.mjs";
 import { CIPHERED, WARDED, applyDecode, copyOutcome, decodeNeeded, fits, markKnown, markRead } from "./book-rules.mjs";
 import { entryPages, entryWholeBook, typeOf } from "./entry-types.mjs";
-import { LANGUAGE, hasSpecialised, languageVariants, normalize } from "./names.mjs";
+import { activeSystem, term } from "./systems/index.mjs";
 
 const { DialogV2 } = foundry.applications.api;
 
-const CORRUPTION_KEYS = { minor: "CORRUPTION.Minor", moderate: "CORRUPTION.Moderate", major: "CORRUPTION.Major" };
 const COPY_DIFFICULTY = "challenging";
 
-export const corruptionLabel = (strength) => game.i18n.localize(CORRUPTION_KEYS[strength]);
+/** Siła Zepsucia: nazwa z systemu, a gdy system jej nie ma – z tłumaczeń modułu. */
+export function corruptionLabel(strength) {
+  const key = activeSystem().corruptionKey(strength);
+  return key && game.i18n.has(key) ? game.i18n.localize(key) : t(`Corruption.${strength}`);
+}
 
 const costProviders = [];
 
@@ -27,29 +30,12 @@ export function registerCopyCost(provider) {
   costProviders.push(provider);
 }
 
-/** Test czytania: wskazana umiejętność, inaczej język księgi, a bez niego Inteligencja. */
-async function rollReadingTest(ctx, { skill, difficulty, title }) {
-  const { actor, book } = ctx;
-  const context = { fields: { difficulty }, title, skipTargets: true };
-  const skills = actor.itemTypes.skill;
-  let test;
-  if (skill?.trim()) {
-    const named = skills.find((s) => normalize(s.name) === normalize(skill));
-    if (!named) {
-      ui.notifications.warn(t("Page.NeedsSkill", { skill }));
-      return null;
-    }
-    test = await actor.setupSkill(named, context);
-  } else {
-    const language = skills.find((s) => hasSpecialised([s.name], LANGUAGE, languageVariants(book.language)));
-    test = language ? await actor.setupSkill(language, context) : await actor.setupCharacteristic("int", context);
-  }
-  if (!test) return null;
-  await test.roll();
-  return test;
+/** Test czytania w systemie postaci (wykonany) albo null, gdy anulowano. */
+function rollReadingTest(ctx, { skill, difficulty, title }) {
+  return activeSystem().readingTest(ctx.actor, { skill, difficulty, title, language: ctx.book.language });
 }
 
-const outcomeOf = (test) => ({ success: Boolean(test.succeeded), sl: Number(test.result.SL) || 0, fumble: Boolean(test.result.fumble) });
+const outcomeOf = (test) => activeSystem().outcome(test);
 
 async function decipher(item, entry, ctx) {
   const { cipher } = ctx.book;
@@ -60,7 +46,7 @@ async function decipher(item, entry, ctx) {
   await item.update(writeBook(book));
   if (done) ui.notifications.info(t("Page.Deciphered", { name: typeOf(entry).name(entry) }));
   else if (lost) ui.notifications.warn(t("Page.DecipherLost"));
-  else ui.notifications.info(t("Page.DecipherProgress", { progress, needed }));
+  else ui.notifications.info(term("Page.DecipherProgress", { progress, needed }));
 }
 
 async function readForbidden(item, entry, ctx) {
@@ -71,7 +57,12 @@ async function readForbidden(item, entry, ctx) {
     content: `<p>${ctx.isGM ? t("Page.ForbiddenConfirm", { strength: strength.toLocaleLowerCase() }) : t("Page.UnreadConfirm")}</p>`
   });
   if (!confirmed) return;
-  const test = await ctx.actor.corruptionDialog(strength.toLocaleLowerCase());
+  // System bez testu Zepsucia (The Old World): strona zostaje przeczytana, skutki ustala MG
+  if (!supportsCorruption()) {
+    await item.update(writeBook(markRead(readBook(item), ctx.actor.id, entry.id)));
+    return ui.notifications.info(t("Page.ReadNoTest"));
+  }
+  const test = await activeSystem().corruption(ctx.actor, strength);
   if (test) await item.update(writeBook(markRead(readBook(item), ctx.actor.id, entry.id)));
 }
 
@@ -119,6 +110,8 @@ async function copyEntry(item, entry, ctx) {
   await target.update(writeBook(markKnown(book, ctx.actor.id, copy, entryPages)));
   ui.notifications.info(t(copy.flawed ? "Page.CopiedFlawed" : "Page.Copied", { name, book: target.name }));
 }
+
+const supportsCorruption = () => Boolean(activeSystem().features.corruption);
 
 const PAGE_ACTIONS = { decipher, readForbidden, copyEntry };
 

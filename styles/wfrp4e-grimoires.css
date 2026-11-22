@@ -311,7 +311,8 @@
   color: var(--grimoire-ink-soft);
 }
 
-.wfrp4e-grimoires .grimoire-note.status-castable {
+.wfrp4e-grimoires .grimoire-note.status-castable,
+.wfrp4e-grimoires .grimoire-note.status-copyable {
   color: var(--grimoire-ok);
 }
 

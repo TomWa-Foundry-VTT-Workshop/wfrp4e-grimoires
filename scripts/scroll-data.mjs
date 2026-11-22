@@ -2,7 +2,7 @@
  * Dane zwoju – bez zależności od Foundry.
  *
  * Zwój to księga w formie "scroll": jeden wpis, a liczba zwojów to zwykła ilość
- * przedmiotu (system.quantity.value).
+ * przedmiotu (WFRP: system.quantity.value, The Old World: system.quantity).
  */
 import { FORM_SCROLL, emptyBook, isScroll, readBook } from "./grimoire-data.mjs";
 
@@ -21,7 +21,15 @@ export function readScroll(item) {
 
 /** Liczba zwojów w stosie. */
 export function scrollCount(item) {
-  return Math.max(0, Number(item?.system?.quantity?.value ?? 1));
+  const quantity = item?.system?.quantity;
+  const value = quantity !== null && typeof quantity === "object" ? quantity.value : quantity;
+  return Math.max(0, Number(value ?? 1));
+}
+
+/** Ścieżka ilości przedmiotu do aktualizacji (zależna od systemu). */
+export function quantityPath(item) {
+  const quantity = item?.system?.quantity;
+  return quantity !== null && typeof quantity === "object" ? "system.quantity.value" : "system.quantity";
 }
 
 /**

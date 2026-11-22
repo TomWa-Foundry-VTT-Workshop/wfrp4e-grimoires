@@ -5,6 +5,9 @@
  * rzuca się z księgi (przy pechu system losuje tabelę "grimoire-miscast"). Dlatego księga noszona
  * przy sobie wpisuje na kartę niezapamiętane kopie zaklęć, które postać może z niej rzucać.
  * Zapamiętanie (ustawienie M) kosztuje PD wyliczane przez system jego własnym oknem.
+ *
+ * W systemach bez rzucania z księgi (The Old World) nie ma kopii: postać za zgodą MG przepisuje
+ * zaklęcie na kartę. Co system obsługuje, mówi jego adapter (scripts/systems).
  */
 import { MODULE_ID, t, log } from "./constants.mjs";
 import { COPY_FLAG, FORM_BOOK, entriesOfType, isGrimoire, readBook } from "./grimoire-data.mjs";
@@ -13,6 +16,7 @@ import { accessReason, evaluateReading, spellStatus } from "./requirements.mjs";
 import { openEntries as openFor } from "./book-rules.mjs";
 import { entryPages } from "./entry-types.mjs";
 import { normalize } from "./names.mjs";
+import { activeSystem, supports, systemRequirements } from "./systems/index.mjs";
 
 /** Czy zaklęcie jest kopią z księgi (nie liczy się jako znane). */
 export function isCopy(item) {
@@ -28,7 +32,8 @@ export function actorView(actor) {
     spells: (types.spell ?? []).filter((i) => !isCopy(i)).map((i) => ({
       name: i.name,
       lores: spellLores(i),
-      memorized: Boolean(i.system?.memorized?.value)
+      // Bez zapamiętywania (The Old World) zaklęcie na karcie po prostu jest znane
+      memorized: supports("memorize") ? Boolean(i.system?.memorized?.value) : true
     }))
   };
 }
@@ -41,13 +46,16 @@ export function isCarried(book) {
 
 const OPEN_READING = Object.freeze({ readable: true, readWrite: true, language: true });
 
+/** Księga z warunkami, które obsługuje aktywny system (bez zmiany zapisanych danych). */
+const systemBook = (book) => (book ? { ...book, requirements: systemRequirements(book.requirements) } : book);
+
 /**
  * Wszystko, czego typ wpisu potrzebuje o księdze i jej właścicielu.
  * @returns {{item: Item, book: object, form: string, actor: Actor|null, view: object|null,
  *   reading: object, carried: boolean, isGM: boolean}}
  */
 export function bookContext(item) {
-  const book = readBook(item);
+  const book = systemBook(readBook(item));
   const actor = item.actor ?? null;
   const view = actor ? actorView(actor) : null;
   return {
@@ -88,11 +96,10 @@ export function ownedSpell(actor, entry) {
 
 /** Statusy zaklęć księgi dla jej właściciela. */
 export function entryStatuses(book) {
-  const grimoire = readBook(book);
+  const grimoire = systemBook(readBook(book));
   const actor = book.actor;
   if (!grimoire || !actor) return [];
-  const config = game.wfrp4e?.config ?? {};
-  const loreLabel = (lore) => game.i18n.localize(config.magicLores?.[lore] ?? lore);
+  const loreLabel = activeSystem().spell.loreLabel;
   const view = actorView(actor);
   const reading = evaluateReading(view, grimoire);
   return entriesOfType({ entries: openEntries(book) }, SPELL_TYPE).map((entry) => ({
@@ -123,7 +130,8 @@ export async function syncCopies(book) {
   }
   syncing.add(key);
   try {
-    const wanted = isCarried(book) ? entryStatuses(book).filter((s) => s.status === "castable").map((s) => s.entry) : [];
+    // Bez rzucania z księgi (np. The Old World) kopii nie ma – zostaje tylko sprzątanie starych
+    const wanted = supports("copies") && isCarried(book) ? entryStatuses(book).filter((s) => s.status === "castable").map((s) => s.entry) : [];
     const wantedIds = new Set(wanted.map((e) => e.id));
     const existing = copiesOf(actor, book.id);
     const existingIds = new Set(existing.map((i) => i.flags[MODULE_ID][COPY_FLAG].entryId));
@@ -175,15 +183,14 @@ async function castableItem(book, entry) {
 
 /** Rzut zaklęcia z księgi (albo splatanie w 4e). */
 export async function castFromBook(book, entry, { channel = false } = {}) {
+  if (!supports("castFromBook")) return;
   const spell = await castableItem(book, entry);
   if (!spell) return;
-  const actor = book.actor;
-  const test = channel ? await actor.setupChannell(spell) : await actor.setupCast(spell);
-  if (test?.roll) await test.roll();
+  await activeSystem().cast(book.actor, spell, { channel });
 }
 
 /* -------------------------------------------- */
-/*  Zapamiętanie zaklęcia (za zgodą MG)          */
+/*  Nauka zaklęcia (za zgodą MG)                 */
 /* -------------------------------------------- */
 
 const MEMORIZE_QUERY = `${MODULE_ID}.memorizeSpell`;
@@ -194,17 +201,18 @@ export function registerMemorizeQuery() {
     const book = await fromUuid(bookUuid);
     const entry = readBook(book)?.entries.find((s) => s.id === entryId);
     if (!book?.actor || !entry) return { ok: false };
+    const memorizing = supports("memorize");
     const approved = await foundry.applications.api.DialogV2.confirm({
-      window: { title: t("Learn.Title") },
-      content: `<p>${t("Learn.Confirm", {
+      window: { title: t(memorizing ? "Learn.Title" : "Learn.TitleCopy") },
+      content: `<p>${t(memorizing ? "Learn.Confirm" : "Learn.ConfirmCopy", {
         user: foundry.utils.escapeHTML(user?.name ?? ""),
         actor: foundry.utils.escapeHTML(book.actor.name),
         spell: foundry.utils.escapeHTML(entry.data.name),
-        current: book.actor.system.details?.experience?.current ?? 0
+        current: activeSystem().xp(book.actor)
       })}</p>`
     });
     if (!approved) return { ok: false, reason: "denied" };
-    await memorize(book, entry);
+    await (memorizing ? memorize(book, entry) : writeOnSheet(book, entry));
     return { ok: true };
   };
 }
@@ -235,19 +243,38 @@ async function memorize(book, entry) {
   });
 }
 
-/** Prośba o zapamiętanie: MG zatwierdza, a koszt PD liczy system. */
+/** Przepisanie zaklęcia z księgi na kartę postaci (systemy bez zapamiętywania). */
+async function writeOnSheet(book, entry) {
+  const actor = book.actor;
+  if (!ownedSpell(actor, entry)) {
+    const data = foundry.utils.deepClone(entry.data);
+    if (data.flags?.[MODULE_ID]) delete data.flags[MODULE_ID][COPY_FLAG];
+    await actor.createEmbeddedDocuments("Item", [data]);
+  }
+  await ChatMessage.create({
+    speaker: ChatMessage.getSpeaker({ actor }),
+    content: `<p>${t("Learn.LearnedCopy", {
+      actor: foundry.utils.escapeHTML(actor.name),
+      spell: foundry.utils.escapeHTML(entry.data.name),
+      book: foundry.utils.escapeHTML(book.name)
+    })}</p>`
+  });
+}
+
+/** Prośba o naukę: MG zatwierdza, a koszt PD (jeśli jest) liczy system. */
 export async function requestMemorize(book, entry) {
   const gm = game.users.activeGM;
-  if (!gm) return ui.notifications.warn(t("Learn.NoGM"));
+  if (!gm) return ui.notifications.warn(t(supports("memorize") ? "Learn.NoGM" : "Learn.NoGMCopy"));
   const payload = { bookUuid: book.uuid, entryId: entry.id };
   try {
     const result = gm.isSelf
       ? await CONFIG.queries[MEMORIZE_QUERY](payload, { user: game.user })
       : await gm.query(MEMORIZE_QUERY, payload, { timeout: 5 * 60 * 1000 });
-    if (result?.reason === "denied") ui.notifications.info(t("Learn.Denied"));
+    const copying = !supports("memorize");
+    if (result?.reason === "denied") ui.notifications.info(t(copying ? "Learn.DeniedCopy" : "Learn.Denied"));
   } catch (err) {
-    log.error("Zapamiętanie zaklęcia", err);
-    ui.notifications.error(t("Learn.Failed"));
+    log.error("Nauka zaklęcia", err);
+    ui.notifications.error(t(supports("memorize") ? "Learn.Failed" : "Learn.FailedCopy"));
   }
 }
 

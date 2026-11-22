@@ -2,7 +2,7 @@
 
 **English** | [Polski](README.pl.md)
 
-Tomes and scrolls for **WFRP4e 10.x**: their own inventory sections and an open-book window with a table of contents, full details of each entry, casting from the book and memorising spells with GM approval. A tome can hold more than spells: other modules add their own kinds of entries, such as the recipes of *Old World Alchemy*.
+Tomes and scrolls for **WFRP4e 10.x** and **Warhammer: The Old World**: their own inventory sections and an open-book window with a table of contents, full details of each entry, casting from the book and memorising spells with GM approval. A tome can hold more than spells: other modules add their own kinds of entries, such as the recipes of *Old World Alchemy*.
 
 ## 📖 How it works
 
@@ -83,10 +83,21 @@ What a book requires of its reader is set on each book, in edit mode.
 
 Talents and skills are recognised in **English and Polish** (e.g. *Arcane Magic (Life)* / *Magia Tajemna (Życia)*, *Language (Magick)* / *Język (Magiczny)*), whatever language the Foundry interface uses. A character also counts as knowing a Lore if they already know a spell of it.
 
+## 🏰 Warhammer: The Old World
+
+The module also works in **Warhammer: The Old World** (system `whtow`). The tome window, table of contents, illuminated pages, ciphers, copying between books and scrolls are the same, but the rules follow that system:
+
+* In The Old World a spell is cast only from the character sheet (a Lore test builds up power until it reaches the spell's CV). The tome is therefore a store of spells, not something you cast from: **Copy onto your sheet** asks the GM and then puts the spell on the character. Spells cost no XP in that system.
+* The medallion shows the **Casting Value (CV)**. Range, target and duration show the system's value and its custom text. Lores get the module's school looks: Battle as Fire, Elementalism as the Heavens, Illusion as Shadow, Necromancy and Daemonology as their own, and other spells as plain magic.
+* Tomes and scrolls get their own sections under Trappings. A tome is a trapping you can equip; equipped means **Carried**.
+* The system has no Read/Write talent, Language skill, equip points or Corruption test for reading, so those requirements and settings are off. A book still needs to be carried, and the **Lore** requirement is met by a character who already knows a spell of that Lore (the GM can switch it off for an apprentice's first spell).
+* Ciphers use a test of the skill named on the book (Recall by default) and count successes. A failed copy is flawed (CV +2), never ruined.
+* Scrolls keep the text of a spell, but the system has no casting from scrolls.
+
 ## 📦 Requirements
 
 * Foundry VTT **v14**
-* WFRP4e system **10.0+**
+* WFRP4e system **10.0+** or Warhammer: The Old World system **1.3+**
 
 ## 🔌 API
 

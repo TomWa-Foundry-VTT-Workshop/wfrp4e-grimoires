@@ -39,7 +39,8 @@
       "unreadable": "You can't read it",
       "none": "",
       "unmemorized": "In the grimoire, not memorised",
-      "learnable": "Petty spell you can learn"
+      "learnable": "Petty spell you can learn",
+      "copyable": "You can copy it onto your sheet"
     },
     "Note": {
       "known": "You already know this spell; you don't need the grimoire to cast it.",
@@ -49,21 +50,24 @@
       "none": "Give the grimoire to a character to cast from it.",
       "notCarried": "Mark the grimoire as carried to cast from it.",
       "unmemorized": "This spell is on your sheet but not memorised: you cast it from the grimoire with doubled CN, and a miscast rolls on the Grimoire Miscast table. Memorise it to cast without the book.",
-      "learnable": "Petty spells are not cast from a grimoire. Memorise this one to add it to your Petty Magic."
+      "learnable": "Petty spells are not cast from a grimoire. Memorise this one to add it to your Petty Magic.",
+      "copyable": "Spells are cast from the character sheet. Copy this spell onto your sheet (the GM approves it) to cast it like your other spells."
     },
     "Stat": {
       "CN": "Casting Number",
       "Range": "Range",
       "Target": "Target",
       "Duration": "Duration",
-      "CNMemorized": "memorised: {cn}"
+      "CNMemorized": "memorised: {cn}",
+      "CV": "Casting Value"
     },
     "Action": {
       "Cast": "Cast from the grimoire",
       "Channel": "Channel",
       "Learn": "Memorise",
       "Chat": "To chat",
-      "Open": "Spell sheet"
+      "Open": "Spell sheet",
+      "LearnCopy": "Copy onto your sheet"
     },
     "Edit": {
       "Toggle": "Edit the tome",
@@ -98,7 +102,10 @@
         "2": "both hands",
         "1": "one hand",
         "0": "no hands"
-      }
+      },
+      "CipherOn": "Ciphered",
+      "CipherSuccesses": "Successes per page",
+      "CipherSkillRecall": "Recall"
     },
     "Learn": {
       "Title": "Memorise a spell",
@@ -106,7 +113,13 @@
       "Learned": "{actor} memorised <strong>{spell}</strong>.",
       "Denied": "The GM did not allow memorising this spell.",
       "NoGM": "A GM must be online to approve memorising a spell.",
-      "Failed": "Memorising the spell failed. See the console (F12) for details."
+      "Failed": "Memorising the spell failed. See the console (F12) for details.",
+      "TitleCopy": "Copy a spell onto the sheet",
+      "ConfirmCopy": "{user} wants {actor} to copy <strong>{spell}</strong> from the tome onto their sheet (has {current} XP). Allow?",
+      "LearnedCopy": "{actor} copied <strong>{spell}</strong> from {book} onto their sheet.",
+      "DeniedCopy": "The GM did not allow copying this spell onto the sheet.",
+      "NoGMCopy": "A GM must be online to approve copying a spell onto the sheet.",
+      "FailedCopy": "Copying the spell onto the sheet failed. See the console (F12) for details."
     },
     "Languages": {
       "magick": "Magick",
@@ -192,7 +205,8 @@
       "EmptyEditable": "This scroll is blank. Drag a spell here from a compendium, the Items directory or a character sheet.",
       "NoteNoActor": "Give the scroll to a character to cast from it.",
       "NoteConsume": "Reading the scroll casts the spell with its normal CN; the scroll is used up whether the test succeeds or not.",
-      "NoteConsumeOnSuccess": "Reading the scroll casts the spell with its normal CN; the scroll is used up only if the test succeeds."
+      "NoteConsumeOnSuccess": "Reading the scroll casts the spell with its normal CN; the scroll is used up only if the test succeeds.",
+      "NoteNoCast": "This system has no casting from scrolls: the scroll keeps the text of the spell. The GM decides what reading it does."
     },
     "CreateType": "Tome",
     "CreateHint": "A book of spells and other writings. It is a Books and Documents trapping, so it works with the inventory and trading.",
@@ -205,7 +219,8 @@
       "Note": {
         "ciphered": "This page is written in cipher. Each attempt adds the SL you score; a fumble or a failure of -3 SL or worse loses the work so far.",
         "warded": "Reading this page is a {strength} exposure to Corruption.",
-        "unread": "You have not read this page yet."
+        "unread": "You have not read this page yet.",
+        "cipheredPool": "This page is written in cipher. Each successful attempt adds the successes you roll; a failure adds nothing."
       },
       "Sealed": {
         "ciphered": "The page is written in cipher.",
@@ -233,7 +248,10 @@
       "FlawSpell": "CN +{penalty}.",
       "unread": "Unread page",
       "ReadUnread": "Read the page",
-      "UnreadConfirm": "Begin reading this page?"
+      "UnreadConfirm": "Begin reading this page?",
+      "DecipherProgressPool": "{progress}/{needed} successes of this page worked out.",
+      "FlawSpellCV": "CV +{penalty}.",
+      "ReadNoTest": "The page has been read. This system has no Corruption test for reading, so the GM decides what it does."
     },
     "Spread": {
       "Contents": "Contents",
@@ -250,6 +268,12 @@
     "Hands": {
       "NotHeld": "{name} ({kind}) works from the inventory and isn’t held in the hands.",
       "Full": "Not enough free hands for {name}: it needs {need}, {free} free (held: {held})."
+    },
+    "CVShort": "CV",
+    "Corruption": {
+      "minor": "Minor",
+      "moderate": "Moderate",
+      "major": "Major"
     }
   }
 }

@@ -2,7 +2,7 @@
 
 [English](README.md) | **Polski**
 
-Księgi i zwoje dla **WFRP4e 10.x**: osobne działy w ekwipunku i okno otwartej księgi ze spisem treści, pełnymi szczegółami wpisu, rzucaniem z księgi i zapamiętywaniem zaklęć za zgodą MG. Księga może zawierać nie tylko zaklęcia: inne moduły dokładają własne rodzaje wpisów, na przykład receptury z *Alchemii Starego Świata*.
+Księgi i zwoje dla **WFRP4e 10.x** i **Warhammer: The Old World**: osobne działy w ekwipunku i okno otwartej księgi ze spisem treści, pełnymi szczegółami wpisu, rzucaniem z księgi i zapamiętywaniem zaklęć za zgodą MG. Księga może zawierać nie tylko zaklęcia: inne moduły dokładają własne rodzaje wpisów, na przykład receptury z *Alchemii Starego Świata*.
 
 ## 📖 Jak to działa
 
@@ -83,10 +83,21 @@ To, czego księga wymaga od czytelnika, ustawia się przy każdej księdze w try
 
 Talenty i umiejętności są rozpoznawane **po angielsku i po polsku** (np. *Arcane Magic (Life)* / *Magia Tajemna (Życia)*, *Language (Magick)* / *Język (Magiczny)*), niezależnie od języka interfejsu Foundry. Postać zna też Tradycję, jeśli zna już jakieś jej zaklęcie.
 
+## 🏰 Warhammer: The Old World
+
+Moduł działa też w **Warhammer: The Old World** (system `whtow`). Okno księgi, spis treści, iluminowane strony, szyfry, przepisywanie między księgami i zwoje są takie same, ale zasady idą za tym systemem:
+
+* W The Old World zaklęcie rzuca się tylko z karty postaci (test szkoły zbiera moc, aż dorówna Wartości Rzucania zaklęcia). Księga jest więc zbiorem zaklęć, a nie czymś, z czego się rzuca: **Przepisz na kartę** pyta MG, a potem dodaje zaklęcie postaci. W tym systemie zaklęcia nie kosztują PD.
+* Medalion pokazuje **Wartość Rzucania (WR)**. Zasięg, cel i czas trwania pokazują wartość systemu i jego własny opis. Szkoły dostają wygląd szkół modułu: magia bitewna jak Ogień, żywiołów jak Niebiosa, iluzji jak Cienie, nekromancja i demonologia własne, pozostałe jak magia bez szkoły.
+* Księgi i zwoje mają własne działy pod wyposażeniem (Trappings). Księga to przedmiot, który można założyć; założona znaczy **przy sobie**.
+* System nie ma talentu Czytanie/Pisanie, umiejętności Język, punktów wyposażenia ani testu Zepsucia przy lekturze, więc te warunki i ustawienia są wyłączone. Księgę nadal trzeba mieć przy sobie, a warunek **Tradycji** spełnia postać, która zna już zaklęcie tej szkoły (dla pierwszego zaklęcia ucznia MG może go wyłączyć).
+* Szyfr odczytuje się testem umiejętności wpisanej w księdze (domyślnie Przypominanie) i liczy sukcesy. Nieudany odpis jest wadliwy (WR +2), nigdy zniszczony.
+* Zwój przechowuje treść zaklęcia, ale system nie ma rzucania ze zwojów.
+
 ## 📦 Wymagania
 
 * Foundry VTT **v14**
-* system WFRP4e **10.0+**
+* system WFRP4e **10.0+** albo Warhammer: The Old World **1.3+**
 
 ## 🔌 API
 

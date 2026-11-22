@@ -1,7 +1,9 @@
 /**
  * Dane wpisu typu "zaklęcie" – bez zależności od Foundry.
+ * Pola zaklęcia czyta adapter systemu (scripts/systems), domyślnie aktywnego.
  */
 import { FLAG_SCOPE } from "./grimoire-data.mjs";
+import { activeSystem } from "./systems/index.mjs";
 
 export const SPELL_TYPE = "spell";
 
@@ -19,9 +21,10 @@ export function spellEntry(spellData, { id, sourceUuid } = {}) {
   return { id, type: SPELL_TYPE, sourceUuid: sourceUuid ?? null, data };
 }
 
-/** Tradycje zaklęcia (system 10.x trzyma tablicę, starsze wersje – tekst). */
+/** Tradycje zaklęcia: WFRP 10.x trzyma tablicę w `lore.value`, starsze wersje tekst, The Old World tekst w `lore`. */
 export function spellLores(data) {
-  const value = data?.system?.lore?.value;
+  const lore = data?.system?.lore;
+  const value = lore !== null && typeof lore === "object" ? lore.value : lore;
   return [value].flat().filter(Boolean);
 }
 
@@ -32,19 +35,13 @@ export function sameSpell(a, b) {
 }
 
 /** Najważniejsze dane czaru do wyświetlenia. */
-export function spellSummary(data) {
-  const system = data?.system ?? {};
+export function spellSummary(data, system = activeSystem()) {
   return {
     name: data?.name ?? "",
     img: data?.img,
     lores: spellLores(data),
-    cn: Number(system.cn?.value ?? 0),
-    range: system.range?.value ?? "",
-    target: system.target?.value ?? "",
-    duration: system.duration?.value ?? "",
-    description: system.description?.value ?? "",
-    isPetty: spellLores(data).includes("petty"),
-    isRitual: Boolean(system.ritual?.value)
+    ...system.spell.read(data?.system ?? {}),
+    isPetty: spellLores(data).includes("petty")
   };
 }
 
@@ -57,9 +54,9 @@ export function spellPages(summary) {
 export const FLAW_CN_PENALTY = 2;
 
 /** Wpis po nieudanym przepisaniu: wyższy PM. */
-export function flawSpell(entry) {
-  const cn = Number(entry.data?.system?.cn?.value ?? 0);
-  return { ...entry, data: { ...entry.data, system: { ...entry.data.system, cn: { ...entry.data.system?.cn, value: cn + FLAW_CN_PENALTY } } } };
+export function flawSpell(entry, system = activeSystem()) {
+  const cn = system.spell.read(entry.data?.system ?? {}).cn;
+  return { ...entry, data: { ...entry.data, system: system.spell.withCN(entry.data?.system ?? {}, cn + FLAW_CN_PENALTY) } };
 }
 
 /** Statusy, w których postać rzuca zaklęcie z księgi (czyli niezapamiętane). */

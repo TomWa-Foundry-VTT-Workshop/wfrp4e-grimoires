@@ -5,10 +5,11 @@
  * (system zapisuje wtedy dane zaklęcia w teście, więc karta czatu – obrażenia, przeciążenie – działa).
  * Zaklęcie ze zwoju liczy się jako zapamiętane: PM bazowy.
  */
-import { MODULE_ID, t, log } from "./constants.mjs";
+import { t, log } from "./constants.mjs";
 import { FLAG_SCOPE, GRIMOIRE_FLAG, readBook, writeBook } from "./grimoire-data.mjs";
 import { SPELL_TYPE, spellEntry } from "./spell-data.mjs";
-import { emptyScroll, readScroll, scrollCount, scrollName, shouldConsume } from "./scroll-data.mjs";
+import { emptyScroll, quantityPath, readScroll, scrollCount, scrollName, shouldConsume } from "./scroll-data.mjs";
+import { activeSystem, supports } from "./systems/index.mjs";
 import { bookContext } from "./actors.mjs";
 import { typeOf } from "./entry-types.mjs";
 import { getSettings } from "./settings.mjs";
@@ -17,7 +18,7 @@ import { getSettings } from "./settings.mjs";
 export async function castFromScroll(scroll) {
   const actor = scroll.actor;
   const entry = readScroll(scroll)?.entry;
-  if (!actor || entry?.type !== SPELL_TYPE) return;
+  if (!actor || entry?.type !== SPELL_TYPE || !supports("scrollCast")) return;
   if (!bookContext(scroll).reading.readable) return ui.notifications.warn(t("Scroll.CannotRead"));
   if (scrollCount(scroll) < 1) return ui.notifications.warn(t("Scroll.NoneLeft"));
 
@@ -30,9 +31,8 @@ export async function castFromScroll(scroll) {
 
   let test;
   try {
-    // Oznaczenie testu ze zwoju (dla innych modułów i makr)
-    test = await actor.setupCast(spell, { appendTitle: ` – ${t("Scroll.FromScroll")}`, [MODULE_ID]: { scroll: true } });
-    if (test?.roll) await test.roll();
+    // Test oznaczony jako ze zwoju (dla innych modułów i makr) – patrz adapter systemu
+    test = await activeSystem().castScroll(actor, spell, { title: t("Scroll.FromScroll") });
   } catch (err) {
     log.error("Rzut ze zwoju", err);
     return ui.notifications.error(t("Scroll.Failed"));
@@ -48,7 +48,7 @@ export async function consumeScroll(scroll) {
     await scroll.delete();
     ui.notifications.info(t("Scroll.Consumed", { scroll: scroll.name }));
   } else {
-    await scroll.update({ "system.quantity.value": count - 1 });
+    await scroll.update({ [quantityPath(scroll)]: count - 1 });
   }
 }
 
@@ -58,7 +58,7 @@ function scrollItemData() {
     type: "trapping",
     name: t("Scroll.NewScroll"),
     img: "icons/sundries/scrolls/scroll-bound-red-tan.webp",
-    system: { trappingType: { value: "booksAndDocuments" }, encumbrance: { value: 0 }, quantity: { value: 1 } },
+    ...activeSystem().book.scroll(),
     flags: { [FLAG_SCOPE]: { [GRIMOIRE_FLAG]: emptyScroll() } }
   };
 }
@@ -72,7 +72,7 @@ export async function createScroll(actor) {
 /** Zamienia zwykłą książkę/dokument w zwój. */
 export async function makeScroll(item) {
   await item.update({
-    "system.trappingType.value": "booksAndDocuments",
+    ...activeSystem().book.makeScroll(),
     [`flags.${FLAG_SCOPE}.${GRIMOIRE_FLAG}`]: emptyScroll()
   });
 }

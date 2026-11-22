@@ -1,6 +1,7 @@
 /**
  * Integracja z kartą postaci i arkuszem przedmiotu:
- *  - osobny dział "Księgi zaklęć" w ekwipunku (hook systemu wfrp4e:constructInventory),
+ *  - osobny dział "Księgi zaklęć" w ekwipunku: w WFRP przez hook systemu wfrp4e:constructInventory,
+ *    w innych systemach (The Old World) działy dokładane do listy wyposażenia po renderze karty,
  *  - ikona otwarcia księgi w wierszu, "+" tworzący nową księgę,
  *  - znacznik kopii zaklęć z księgi w zakładce Magia,
  *  - przycisk w nagłówku arkusza książki: "Otwórz księgę" / "Uczyń księgą zaklęć",
@@ -13,6 +14,7 @@ import { isCopy } from "./actors.mjs";
 import { GrimoireApp } from "./grimoire-app.mjs";
 import { ScrollApp } from "./scroll-app.mjs";
 import { createScroll, makeScroll } from "./scrolls.mjs";
+import { activeSystem } from "./systems/index.mjs";
 
 const SECTION = "grimoires";
 const SCROLL_SECTION = "scrolls";
@@ -21,10 +23,10 @@ const SCROLL_SECTION = "scrolls";
 const CREATE_MARKER = "newGrimoire";
 const OPEN_AFTER_CREATE = `${MODULE_ID}.openBook`;
 
-/** Wygląd i rodzaj przedmiotu nowej księgi (bez nazwy i danych księgi). */
+/** Wygląd i dane systemu nowej księgi (bez nazwy i danych księgi). */
 const bookBase = (kind = null) => ({
   img: kind?.img ?? "icons/sundries/books/book-embossed-gold-red.webp",
-  system: { trappingType: { value: "booksAndDocuments" }, encumbrance: { value: 1 } }
+  ...activeSystem().book.data()
 });
 
 /** Dział ekwipunku dla rodzaju księgi. */
@@ -128,7 +130,7 @@ function registerCreateDialog() {
 /** Zamienia zwykłą książkę (trapping) w księgę zaklęć. */
 export async function makeGrimoire(item) {
   await item.update({
-    "system.trappingType.value": "booksAndDocuments",
+    ...activeSystem().book.make(),
     [`flags.${FLAG_SCOPE}.${GRIMOIRE_FLAG}`]: emptyBook()
   });
   GrimoireApp.open(item);
@@ -139,40 +141,22 @@ export function registerInventory() {
   keepBookWeight();
 
   // Dział w ekwipunku: księgi wyjęte z "Książek i dokumentów"
-  Hooks.on("wfrp4e:constructInventory", (_sheet, categories, collapsed) => {
-    const books = categories.booksAndDocuments?.items ?? [];
-    const grimoires = books.filter((i) => isGrimoire(i) && !registeredKind(i));
-    const scrolls = books.filter(isScroll);
-    if (categories.booksAndDocuments) categories.booksAndDocuments.items = books.filter((i) => !isGrimoire(i) && !isScroll(i));
-    // Każdy rodzaj księgi ma własny dział; księgi, których się nie trzyma, nie mają przełącznika „przy sobie”
-    for (const kind of listBookKinds()) {
-      const key = kindSection(kind);
-      categories[key] = {
-        label: game.i18n.localize(kind.sectionKey ?? kind.labelKey),
-        items: books.filter((i) => isGrimoire(i) && registeredKind(i) === kind),
-        ...(kind.held === false ? {} : { toggle: true, toggleName: t("Inventory.Carried") }),
-        show: false,
-        collapsed: collapsed?.[key],
-        dataType: "trapping"
-      };
-    }
-    categories[SECTION] = {
-      label: t("Inventory.Section"),
-      items: grimoires,
-      toggle: true,
-      toggleName: t("Inventory.Carried"),
-      show: false,
-      collapsed: collapsed?.[SECTION],
-      dataType: "trapping"
-    };
-    categories[SCROLL_SECTION] = {
-      label: t("Inventory.ScrollSection"),
-      items: scrolls,
-      show: false,
-      collapsed: collapsed?.[SCROLL_SECTION],
-      dataType: "trapping"
-    };
-  });
+  if (activeSystem().inventory === "hook") {
+    Hooks.on("wfrp4e:constructInventory", (_sheet, categories, collapsed) => {
+      const books = categories.booksAndDocuments?.items ?? [];
+      if (categories.booksAndDocuments) categories.booksAndDocuments.items = books.filter((i) => !isGrimoire(i) && !isScroll(i));
+      for (const section of bookSections()) {
+        categories[section.key] = {
+          label: section.label,
+          items: books.filter(section.holds),
+          ...(section.carried ? { toggle: true, toggleName: t("Inventory.Carried") } : {}),
+          show: false,
+          collapsed: collapsed?.[section.key],
+          dataType: "trapping"
+        };
+      }
+    });
+  }
 
   // Ikony w wierszach i obsługa "+" (render hook wszystkich arkuszy aktorów ApplicationV2)
   Hooks.on("renderActorSheetV2", (app, element) => decorateActorSheet(app, element));
@@ -201,9 +185,59 @@ export function registerInventory() {
   });
 }
 
+/**
+ * Działy ksiąg w kolejności z karty WFRP: rodzaje ksiąg z innych modułów, księgi zaklęć, zwoje.
+ * `carried` – dział ma przełącznik „przy sobie” (księgi, których się nie trzyma, go nie mają).
+ */
+function bookSections() {
+  return [
+    ...listBookKinds().map((kind) => ({
+      key: kindSection(kind),
+      label: game.i18n.localize(kind.sectionKey ?? kind.labelKey),
+      holds: (i) => isGrimoire(i) && registeredKind(i) === kind,
+      carried: kind.held !== false
+    })),
+    { key: SECTION, label: t("Inventory.Section"), holds: (i) => isGrimoire(i) && !registeredKind(i), carried: true },
+    { key: SCROLL_SECTION, label: t("Inventory.ScrollSection"), holds: isScroll, carried: false }
+  ];
+}
+
+/**
+ * Działy ksiąg na karcie bez hooka ekwipunku (The Old World): kopia nagłówka listy wyposażenia
+ * (trapping) dla każdego działu i przeniesione do niej wiersze ksiąg i zwojów. Wiersze zostają
+ * wierszami systemu, więc menu, opis i przełącznik „założone” działają jak wcześniej.
+ */
+function buildSheetSections(element) {
+  const add = element.querySelector('.sheet-list .list-header [data-action="createItem"][data-type="trapping"]');
+  const source = add?.closest(".sheet-list");
+  if (!source || source.dataset.grSections) return;
+  source.dataset.grSections = "1";
+  const rows = [...source.querySelectorAll(".list-content > .list-row[data-uuid]")];
+  let anchor = source;
+  for (const section of bookSections()) {
+    const list = source.cloneNode(true);
+    delete list.dataset.grSections;
+    list.classList.add("inventory", section.key, `${MODULE_ID}-section`);
+    const header = list.querySelector(".list-header");
+    const name = header?.querySelector(".list-name");
+    if (name) name.textContent = section.label;
+    // Kolumna „Założone” to dla ksiąg „Przy sobie”; zwoje jej nie mają
+    const column = [...(header?.children ?? [])].find((el) => !el.matches(".list-name, .list-controls"));
+    if (column) {
+      if (section.carried) column.textContent = t("Inventory.Carried");
+      else column.remove();
+    }
+    const content = list.querySelector(".list-content");
+    content?.replaceChildren(...rows.filter((row) => section.holds(fromUuidSync(row.dataset.uuid))));
+    anchor.after(list);
+    anchor = list;
+  }
+}
+
 function decorateActorSheet(app, element) {
   const actor = app.document;
   if (!actor || !element) return;
+  if (activeSystem().inventory === "dom") buildSheetSections(element);
 
   decorateSection(element, SECTION, "fa-book-open", t("Inventory.Open"), (item) => GrimoireApp.open(item), () => createGrimoire(actor));
   for (const kind of listBookKinds()) {

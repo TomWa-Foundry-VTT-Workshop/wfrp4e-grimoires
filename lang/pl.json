@@ -39,7 +39,8 @@
       "unreadable": "Nie możesz przeczytać",
       "none": "",
       "unmemorized": "W księdze, niezapamiętane",
-      "learnable": "Magia prosta do nauki"
+      "learnable": "Magia prosta do nauki",
+      "copyable": "Możesz przepisać na kartę"
     },
     "Note": {
       "known": "Znasz już to zaklęcie – księga nie jest potrzebna, by je rzucić.",
@@ -49,21 +50,24 @@
       "none": "Daj księgę postaci, aby rzucać z niej zaklęcia.",
       "notCarried": "Oznacz księgę jako noszoną przy sobie, aby z niej rzucać.",
       "unmemorized": "To zaklęcie jest na twojej karcie, ale niezapamiętane: rzucasz je z księgi z podwójnym PM, a pech losuje się z tabeli Grimoire Miscast. Zapamiętaj je, by rzucać bez księgi.",
-      "learnable": "Magii prostej nie rzuca się z księgi. Zapamiętaj to zaklęcie, by dołączyło do twojej Magii prostej."
+      "learnable": "Magii prostej nie rzuca się z księgi. Zapamiętaj to zaklęcie, by dołączyło do twojej Magii prostej.",
+      "copyable": "Zaklęcia rzuca się z karty postaci. Przepisz to zaklęcie na kartę (za zgodą MG), by rzucać je jak pozostałe."
     },
     "Stat": {
       "CN": "Poziom Mocy",
       "Range": "Zasięg",
       "Target": "Cel",
       "Duration": "Czas trwania",
-      "CNMemorized": "po zapamiętaniu: {cn}"
+      "CNMemorized": "po zapamiętaniu: {cn}",
+      "CV": "Wartość Rzucania"
     },
     "Action": {
       "Cast": "Rzuć z księgi",
       "Channel": "Splataj",
       "Learn": "Zapamiętaj",
       "Chat": "Na czat",
-      "Open": "Karta zaklęcia"
+      "Open": "Karta zaklęcia",
+      "LearnCopy": "Przepisz na kartę"
     },
     "Edit": {
       "Toggle": "Edytuj księgę",
@@ -98,7 +102,10 @@
         "2": "obu rękach",
         "1": "jednej ręce",
         "0": "bez rąk"
-      }
+      },
+      "CipherOn": "Zaszyfrowana",
+      "CipherSuccesses": "Sukcesy na stronę",
+      "CipherSkillRecall": "Przypominanie"
     },
     "Learn": {
       "Title": "Zapamiętanie zaklęcia",
@@ -106,7 +113,13 @@
       "Learned": "{actor} zapamiętuje zaklęcie <strong>{spell}</strong>.",
       "Denied": "MG nie zezwolił na zapamiętanie tego zaklęcia.",
       "NoGM": "Do zatwierdzenia zapamiętania zaklęcia potrzebny jest MG online.",
-      "Failed": "Zapamiętanie zaklęcia nie powiodło się. Szczegóły w konsoli (F12)."
+      "Failed": "Zapamiętanie zaklęcia nie powiodło się. Szczegóły w konsoli (F12).",
+      "TitleCopy": "Przepisanie zaklęcia na kartę",
+      "ConfirmCopy": "{user} chce przepisać zaklęcie <strong>{spell}</strong> z księgi na kartę postaci {actor} (ma {current} PD). Zezwolić?",
+      "LearnedCopy": "Zaklęcie <strong>{spell}</strong> z księgi {book} trafia na kartę postaci {actor}.",
+      "DeniedCopy": "MG nie zezwolił na przepisanie tego zaklęcia na kartę.",
+      "NoGMCopy": "Do zatwierdzenia przepisania zaklęcia na kartę potrzebny jest MG online.",
+      "FailedCopy": "Przepisanie zaklęcia na kartę nie powiodło się. Szczegóły w konsoli (F12)."
     },
     "Languages": {
       "magick": "Magiczny",
@@ -192,7 +205,8 @@
       "EmptyEditable": "Ten zwój jest pusty. Przeciągnij tu zaklęcie z kompendium, katalogu przedmiotów albo karty postaci.",
       "NoteNoActor": "Daj zwój postaci, aby z niego rzucić.",
       "NoteConsume": "Odczytanie zwoju rzuca zaklęcie ze zwykłym PM; zwój zużywa się niezależnie od wyniku testu.",
-      "NoteConsumeOnSuccess": "Odczytanie zwoju rzuca zaklęcie ze zwykłym PM; zwój zużywa się tylko po udanym teście."
+      "NoteConsumeOnSuccess": "Odczytanie zwoju rzuca zaklęcie ze zwykłym PM; zwój zużywa się tylko po udanym teście.",
+      "NoteNoCast": "W tym systemie nie rzuca się zaklęć ze zwojów: zwój przechowuje treść zaklęcia, a o skutkach odczytania decyduje MG."
     },
     "CreateType": "Księga",
     "CreateHint": "Księga zaklęć i innych zapisków. To przedmiot z działu Książki i dokumenty, więc działa z ekwipunkiem i handlem.",
@@ -205,7 +219,8 @@
       "Note": {
         "ciphered": "Ta strona jest zaszyfrowana. Każda próba dodaje uzyskane PS; pech albo porażka o 3 PS lub więcej kasuje dotychczasową pracę.",
         "warded": "Przeczytanie tej strony to ekspozycja na Zepsucie: {strength}.",
-        "unread": "Ta strona nie została jeszcze przeczytana."
+        "unread": "Ta strona nie została jeszcze przeczytana.",
+        "cipheredPool": "Ta strona jest zaszyfrowana. Każda udana próba dodaje wyrzucone sukcesy; porażka nic nie dodaje."
       },
       "Sealed": {
         "ciphered": "Ta strona jest zaszyfrowana.",
@@ -233,7 +248,10 @@
       "FlawSpell": "PM +{penalty}.",
       "unread": "Nieprzeczytana strona",
       "ReadUnread": "Przeczytaj stronę",
-      "UnreadConfirm": "Rozpocząć lekturę tej strony?"
+      "UnreadConfirm": "Rozpocząć lekturę tej strony?",
+      "DecipherProgressPool": "Odczytano {progress}/{needed} sukcesów tej strony.",
+      "FlawSpellCV": "WR +{penalty}.",
+      "ReadNoTest": "Strona przeczytana. W tym systemie lektura nie wymaga testu Zepsucia, skutki ustala MG."
     },
     "Spread": {
       "Contents": "Spis treści",
@@ -250,6 +268,12 @@
     "Hands": {
       "NotHeld": "{name} to {kind}: działa z samego ekwipunku i nie trzyma się jej w rękach.",
       "Full": "Za mało wolnych rąk na {name}: potrzeba {need}, wolne {free} (zajmują je: {held})."
+    },
+    "CVShort": "WR",
+    "Corruption": {
+      "minor": "Pomniejsze",
+      "moderate": "Umiarkowane",
+      "major": "Poważne"
     }
   }
 }

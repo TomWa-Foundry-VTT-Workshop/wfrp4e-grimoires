@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- **Warhammer: The Old World**: the module now works in the `whtow` system too. Tomes and scrolls get their own sections under Trappings, the tome window shows the spell's Casting Value, the system's range, target and duration and the Lore in a matching school look. Spells are cast from the character sheet in that system, so a tome offers **Copy onto your sheet** with GM approval instead of casting and memorising. Requirements the system has no rules for (literacy, language, hands, Corruption on reading) are off, ciphers count successes on a skill test (Recall by default), and scrolls keep a spell's text without casting.
+- Under the hood: system adapters in `scripts/systems/` describe what differs between Warhammer systems (book item, spell fields, casting, learning, tests). WFRP4e works as before.
+
 ## 0.8.0
 - Polish letters in the decorative fonts: Nodesto Caps and Caslon Antique have no ą, ę, ł, ś, ż…, so the browser filled them in from another typeface. When Foundry runs in Polish, headings now use Grenze Gotisch and titles Almendra, both with the full Polish alphabet (SIL Open Font License, files and licences in `assets/fonts`). English keeps the original fonts.
 - **Book kinds** for other modules (`registerBookKind`): a kind uses the same tome window but gets its own inventory section, entry in the Create Item dialog, default settings (cover, capacity, requirements), a list of entry types it accepts and its own look (`data-kind` on the window). A kind can be marked as not held: such a book works straight from the inventory, takes no hands, can't be equipped and has no "Carried" requirement. Old World Alchemy uses this for alchemical books.

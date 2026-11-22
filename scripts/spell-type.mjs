@@ -2,7 +2,7 @@
  * Typ wpisu "zaklęcie": status, szczegóły i akcje zaklęcia w księdze albo na zwoju.
  */
 import { I18N, MODULE_ID, t } from "./constants.mjs";
-import { getEdition } from "./edition.mjs";
+import { activeSystem, supports, term } from "./systems/index.mjs";
 import { FORM_SCROLL } from "./grimoire-data.mjs";
 import {
   FLAW_CN_PENALTY, FROM_BOOK_STATUSES, SPELL_TYPE, effectiveCN, flawSpell, sameSpell, spellEntry, spellLores, spellPages, spellSummary
@@ -16,18 +16,23 @@ import { loreGlyph, loreMarginalia, loreTheme } from "./ui.mjs";
 
 const TextEditorImpl = () => foundry.applications.ux.TextEditor.implementation;
 
-const loreLabel = (lore) => game.i18n.localize(game.wfrp4e?.config?.magicLores?.[lore] ?? lore);
+const loreLabel = (lore) => activeSystem().spell.loreLabel(lore);
+/** Motyw iluminacji szkoły (adapter przekłada szkoły innych systemów na motywy modułu). */
+const loreThemeKey = (lore) => activeSystem().spell.loreTheme(lore ?? "") ?? "";
 const loresText = (summary) => summary.lores.map(loreLabel).join(", ");
 
 const STATUS_ICONS = {
   known: "fa-check",
   readOnly: "fa-eye",
   unmemorized: "fa-book-open",
-  learnable: "fa-graduation-cap"
+  learnable: "fa-graduation-cap",
+  copyable: "fa-pen-nib"
 };
 
 function stat(key, value, hint) {
-  return { key, label: t(`Stat.${key}`), value, hint };
+  // Medalion to zawsze klucz "CN"; nazwa zależy od systemu (PM w WFRP, CV w The Old World)
+  const label = key === "CN" ? t(`Stat.${activeSystem().spell.cnStat}`) : t(`Stat.${key}`);
+  return { key, label, value, hint };
 }
 
 /** Akcje "tylko do przeglądania", wspólne dla księgi i zwoju. */
@@ -45,9 +50,13 @@ async function bookDetails(entry, status, ctx) {
   const cn = effectiveCN(s, status);
   const actions = [];
   if (castable) actions.push({ id: "cast", label: t("Action.Cast"), icon: "fa-wand-sparkles", primary: true });
-  if (castable && !s.isPetty && s.cn > 0 && getEdition() !== "5e") actions.push({ id: "channel", label: t("Action.Channel"), icon: "fa-hurricane" });
+  if (castable && !s.isPetty && s.cn > 0 && supports("channel") && activeSystem().channelAvailable()) {
+    actions.push({ id: "channel", label: t("Action.Channel"), icon: "fa-hurricane" });
+  }
   // Zapamiętanie: te same warunki co rzucanie (czytanie + Tradycja); koszt PD liczy system
   if (owner && [...FROM_BOOK_STATUSES, "learnable"].includes(status)) actions.push({ id: "learn", label: t("Action.Learn"), icon: "fa-graduation-cap" });
+  // Bez zapamiętywania (The Old World): przepisanie zaklęcia na kartę za zgodą MG
+  if (owner && status === "copyable") actions.push({ id: "learn", label: t("Action.LearnCopy"), icon: "fa-pen-nib", glyph: "ui-act_memorise", primary: true });
   actions.push(...viewActions(ctx));
   return {
     img: s.img,
@@ -65,14 +74,16 @@ async function bookDetails(entry, status, ctx) {
 
 async function scrollDetails(entry, ctx) {
   const s = spellSummary(entry.data);
-  const canCast = ctx.actor?.isOwner && ctx.reading.readable && scrollCount(ctx.item) > 0;
-  const consumeNote = getSettings().consumeOnFailure ? t("Scroll.NoteConsume") : t("Scroll.NoteConsumeOnSuccess");
+  const castsHere = supports("scrollCast");
+  const canCast = castsHere && ctx.actor?.isOwner && ctx.reading.readable && scrollCount(ctx.item) > 0;
+  const consumeNote = !castsHere ? t("Scroll.NoteNoCast")
+    : getSettings().consumeOnFailure ? t("Scroll.NoteConsume") : t("Scroll.NoteConsumeOnSuccess");
   return {
     img: s.img,
     subtitle: loresText(s),
     stats: [stat("CN", s.cn), stat("Range", s.range), stat("Target", s.target), stat("Duration", s.duration)],
     description: await TextEditorImpl().enrichHTML(s.description, { relativeTo: ctx.item, secrets: ctx.isGM }),
-    note: !ctx.actor ? t("Scroll.NoteNoActor") : !ctx.reading.readable ? t("Scroll.CannotRead") : consumeNote,
+    note: !castsHere ? consumeNote : !ctx.actor ? t("Scroll.NoteNoActor") : !ctx.reading.readable ? t("Scroll.CannotRead") : consumeNote,
     actions: [
       ...(canCast ? [{ id: "castScroll", label: t("Scroll.Cast"), icon: "fa-wand-sparkles", primary: true }] : []),
       ...viewActions(ctx)
@@ -85,9 +96,11 @@ async function postToChat(entry, ctx) {
   const content = await foundry.applications.handlebars.renderTemplate(`modules/${MODULE_ID}/templates/chat-spell.hbs`, {
     ...s,
     lore: loresText(s),
-    theme: loreTheme(s.lores[0] ?? ""),
-    glyph: loreGlyph(s.lores[0] ?? ""),
-    marginalia: loreMarginalia(s.lores[0] ?? ""),
+    cnLabel: t(`Stat.${activeSystem().spell.cnStat}`),
+    cnShort: t(activeSystem().spell.cnShort),
+    theme: loreTheme(loreThemeKey(s.lores[0])),
+    glyph: loreGlyph(loreThemeKey(s.lores[0])),
+    marginalia: loreMarginalia(loreThemeKey(s.lores[0])),
     description: await TextEditorImpl().enrichHTML(s.description),
     book: ctx.item.name
   });
@@ -119,7 +132,10 @@ export const spellType = {
   pages: (entry) => spellPages(spellSummary(entry.data)),
   wholeBook: (entry) => spellSummary(entry.data).isRitual,
   applyFlaw: flawSpell,
-  flawNote: () => t("Page.FlawSpell", { penalty: FLAW_CN_PENALTY }),
+  flawNote: () => term("Page.FlawSpell", { penalty: FLAW_CN_PENALTY }),
+
+  /** Motyw strony: szkoła zaklęcia przełożona przez adapter systemu. */
+  theme: (entry) => loreThemeKey(spellLores(entry.data)[0]),
 
   group(entry) {
     const lore = spellLores(entry.data)[0] ?? "";
@@ -128,8 +144,14 @@ export const spellType = {
 
   status(entry, ctx) {
     if (!ctx.view) return "none";
-    if (ctx.form === FORM_SCROLL) return ctx.reading.readable ? "castable" : "unreadable";
-    return spellStatus(ctx.view, spellSummary(entry.data), ctx.reading, ctx.book.requirements, loreLabel);
+    if (ctx.form === FORM_SCROLL) {
+      if (!ctx.reading.readable) return "unreadable";
+      return supports("scrollCast") ? "castable" : "readOnly";
+    }
+    const status = spellStatus(ctx.view, spellSummary(entry.data), ctx.reading, ctx.book.requirements, loreLabel);
+    // Bez rzucania z księgi to, co dałoby się rzucić, można tylko przepisać na kartę
+    if (!supports("castFromBook") && (status === "castable" || status === "learnable")) return "copyable";
+    return status;
   },
 
   statusLabel: (status) => t(`Status.${status}`),
@@ -137,7 +159,7 @@ export const spellType = {
 
   corner(entry, status) {
     const cn = effectiveCN(spellSummary(entry.data), status);
-    return cn ? `${t("CNShort")} ${cn}` : "";
+    return cn ? `${t(activeSystem().spell.cnShort)} ${cn}` : "";
   },
 
   details: (entry, status, ctx) => (ctx.form === FORM_SCROLL ? scrollDetails(entry, ctx) : bookDetails(entry, status, ctx)),

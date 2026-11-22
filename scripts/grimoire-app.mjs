@@ -12,6 +12,7 @@ import { requirementBadges } from "./requirements.mjs";
 import { bookContext, syncCopies } from "./actors.mjs";
 import { CIPHERED, OPEN, WARDED, decodeNeeded, entryProgress, freePages, freeSlots, noRoomReason, pageState, pagesUsed, slotsUsed } from "./book-rules.mjs";
 import { copyAction, corruptionLabel, lockedActions, runEntryAction } from "./book-actions.mjs";
+import { activeSystem, supports, term } from "./systems/index.mjs";
 import { actionGlyph, applyAccessibility, badgeGlyph, isLightCover, loreGlyph, loreMarginalia, loreTheme, statGlyph, statusGlyph, useIlluminated } from "./ui.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -38,15 +39,16 @@ const CONTENTS = "contents";
  * (np. receptura – wiatr magii); reszta to magia bez szkoły.
  */
 const entryTheme = (type, entry, groupKey) => {
-  if (type.id === SPELL_TYPE) return loreTheme(groupKey);
-  return type.theme ? loreTheme(type.theme(entry) ?? "arcane") : "arcane";
+  if (type.theme) return loreTheme(type.theme(entry) ?? "arcane");
+  return type.id === SPELL_TYPE ? loreTheme(groupKey) : "arcane";
 };
 
 /** Sigil wpisu: motyw typu (np. wiatr receptury), inaczej sigil szkoły albo typu. */
 const entryGlyph = (type, entry, groupKey) => (type.theme ? loreGlyph(type.theme(entry) ?? "arcane") : loreGlyph(groupKey, type.id));
 
-/** Pole wyboru warunku w trybie edycji. */
+/** Pole wyboru warunku w trybie edycji (czytanie i język tylko w systemach, które je mają). */
 const REQUIREMENT_TOGGLES = ["readWrite", "language", "carried", "lore"];
+const SYSTEM_REQUIREMENTS = new Set(["readWrite", "language"]);
 
 export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
   /** Otwarte okna według UUID księgi (jedno okno na księgę). */
@@ -214,7 +216,7 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
       const info = await type.details(entry, locked ? "none" : selected.status, ctx);
       const copy = !locked && !hidden ? copyAction(this.book, entry, selected.status, ctx) : null;
       const baseNote = locked
-        ? t(`Page.Note.${shownState(state, isGM)}`, { strength: book.forbidden ? corruptionLabel(book.forbidden).toLocaleLowerCase() : "" })
+        ? term(`Page.Note.${shownState(state, isGM)}`, { strength: book.forbidden ? corruptionLabel(book.forbidden).toLocaleLowerCase() : "" })
         : info.note;
       // Szkoła wybranego wpisu wyznacza motyw strony (kolor rubryk, sigil, marginalia)
       const loreKey = type.group(entry).key;
@@ -252,9 +254,8 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const kind = getBookKind(book.kind);
     const held = isHeldKind(book.kind);
     const hasSpells = acceptsType(book.kind, SPELL_TYPE) && (book.entries.some((entry) => entry.type === SPELL_TYPE) || book.entries.length === 0);
-    const difficulties = Object.entries(game.wfrp4e?.config?.difficultyLabels ?? {}).map(([key, label]) => ({
-      key, label: game.i18n.localize(label), selected: book.cipher?.difficulty === key
-    }));
+    const difficulties = activeSystem().difficulties().map(({ key, label }) => ({ key, label, selected: book.cipher?.difficulty === key }));
+    const hands = held && supports("hands");
     const index = this.view === CONTENTS ? 0 : order.indexOf(this.view) + 1;
     const spread = illuminated ? {
       contents: this.view === CONTENTS,
@@ -282,7 +283,7 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
       kindLabel: kind ? game.i18n.localize(kind.labelKey) : "",
       lightCover: isLightCover(book.cover),
       // Ręce zajmowane przez księgę „przy sobie” (gdy postać jej wymaga przy sobie)
-      handsLabel: book.hands ? t(`Badge.hands${book.hands}`) : "",
+      handsLabel: hands && book.hands ? t(`Badge.hands${book.hands}`) : "",
       languageLabel: languageLabel(book.language),
       languages: Object.keys(LANGUAGES).map((key) => ({ key, label: languageLabel(key), selected: key === book.language })),
       customLanguage: LANGUAGES[book.language] ? "" : book.language,
@@ -292,20 +293,24 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
         label: b.key === "language" ? t("Badge.language", { language: languageLabel(book.language) }) : t(`Badge.${b.key}`)
       })) : [],
       requirementToggles: REQUIREMENT_TOGGLES
-        .filter((key) => (key !== "lore" || hasSpells) && (key !== "carried" || held))
+        .filter((key) => (key !== "lore" || hasSpells) && (key !== "carried" || held) && (!SYSTEM_REQUIREMENTS.has(key) || supports(key)))
         .map((key) => ({ key, label: t(`Edit.Needs.${key}`), checked: book.requirements[key] })),
       slotsLabel: book.slots ? t("Badge.slots", { used: slotsUsed(book, entryWholeBook), total: book.slots }) : "",
       pagesLabel: book.pages ? t("Badge.pages", { used: pagesUsed(book, entryPages), total: book.pages }) : "",
       // Reguły księgi ustala MG: inaczej gracz sam zdjąłby szyfr ze swojej księgi
       rules: isGM ? {
         slots: book.slots ?? "",
-        hands: held ? [2, 1, 0].map((value) => ({ value, label: t(`Edit.HandsOptions.${value}`), selected: book.hands === value })) : null,
+        hands: hands ? [2, 1, 0].map((value) => ({ value, label: t(`Edit.HandsOptions.${value}`), selected: book.hands === value })) : null,
         pages: book.pages ?? "",
         cipherOff: !book.cipher,
         difficulties,
         cipherSkill: book.cipher?.skill ?? "",
         cipherSL: book.cipher?.slPerPage ?? 1,
-        forbidden: ["minor", "moderate", "major"].map((key) => ({ key, label: corruptionLabel(key), selected: book.forbidden === key }))
+        cipherSLLabel: term("Edit.CipherSL"),
+        cipherSkillHint: term("Edit.CipherSkillDefault"),
+        forbidden: supports("corruption") || book.forbidden
+          ? ["minor", "moderate", "major"].map((key) => ({ key, label: corruptionLabel(key), selected: book.forbidden === key }))
+          : null
       } : null,
       actorName: actor?.name,
       carried: ctx.carried,
@@ -501,7 +506,8 @@ export class GrimoireApp extends HandlebarsApplicationMixin(ApplicationV2) {
    * Liczba kart trafia do `data-sheets`, a licznik i rogi stron odświeżają się bez ponownego renderu.
    */
   #paginate(html) {
-    const flow = html.querySelector(".gr-flow");
+    // Obserwator rozmiaru odzywa się też po zamknięciu okna, gdy elementu już nie ma
+    const flow = html?.querySelector(".gr-flow");
     if (!flow) return;
     const inner = flow.querySelector(".gr-flow-inner");
     const gap = 48;

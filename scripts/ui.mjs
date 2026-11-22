@@ -32,7 +32,7 @@ const ACTION_GLYPHS = {
 };
 const STATUS_GLYPHS = {
   known: "ui-status_known", memorized: "ui-status_known", unmemorized: "ui-status_unmemorized", castable: "ui-status_unmemorized",
-  readOnly: "ui-status_read_only", unreadable: "ui-status_unreadable", learnable: "ui-status_learnable",
+  readOnly: "ui-status_read_only", unreadable: "ui-status_unreadable", learnable: "ui-status_learnable", copyable: "ui-status_learnable",
   ciphered: "ui-req_cipher", warded: "ui-req_forbidden", unread: "ui-req_pages"
 };
 const STAT_GLYPHS = { CN: "ui-stat_cn", Range: "ui-stat_range", Target: "ui-stat_target", Duration: "ui-stat_duration", Ingredients: "ui-stat_ingredient" };

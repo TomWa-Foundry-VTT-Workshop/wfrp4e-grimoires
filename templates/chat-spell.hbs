@@ -5,9 +5,9 @@
     <span class="gr-chat-sigil" data-gr-glyph="{{glyph}}"></span>
     <div>
       <h3>{{name}}</h3>
-      <span class="lore">{{lore}}{{#if cn}} · {{localize "WFRP4E_GRIMOIRE.CNShort"}} {{cn}}{{/if}}</span>
+      <span class="lore">{{lore}}{{#if cn}} · {{cnShort}} {{cn}}{{/if}}</span>
     </div>
-    {{#if cn}}<span class="gr-chat-cn" data-tooltip="{{localize 'WFRP4E_GRIMOIRE.Stat.CN'}}"><span data-gr-glyph="orn-cn_medallion"></span><b>{{cn}}</b></span>{{/if}}
+    {{#if cn}}<span class="gr-chat-cn" data-tooltip="{{cnLabel}}"><span data-gr-glyph="orn-cn_medallion"></span><b>{{cn}}</b></span>{{/if}}
   </header>
   <div class="stats">
     {{#if range}}<span><span class="gr-chat-icon" data-gr-glyph="ui-stat_range"></span><b>{{localize "WFRP4E_GRIMOIRE.Stat.Range"}}:</b> {{range}}</span>{{/if}}
