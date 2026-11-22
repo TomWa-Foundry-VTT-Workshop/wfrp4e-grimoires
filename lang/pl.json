@@ -209,7 +209,7 @@
       "NoteConsumeOnSuccess": "Odczytanie zwoju rzuca zaklęcie ze zwykłym PM; zwój zużywa się tylko po udanym teście.",
       "NoteNoCast": "W tym systemie nie rzuca się zaklęć ze zwojów: zwój przechowuje treść zaklęcia, a o skutkach odczytania decyduje MG."
     },
-    "CreateType": "Księga",
+    "CreateType": "Księga Zaklęć",
     "CreateHint": "Księga zaklęć i innych zapisków. To przedmiot z działu Książki i dokumenty, więc działa z ekwipunkiem i handlem.",
     "Types": {
       "spell": "Zaklęcia"

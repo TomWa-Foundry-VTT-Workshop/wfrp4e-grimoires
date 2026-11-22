@@ -209,7 +209,7 @@
       "NoteConsumeOnSuccess": "Reading the scroll casts the spell with its normal CN; the scroll is used up only if the test succeeds.",
       "NoteNoCast": "This system has no casting from scrolls: the scroll keeps the text of the spell. The GM decides what reading it does."
     },
-    "CreateType": "Tome",
+    "CreateType": "Magic Grimoire",
     "CreateHint": "A book of spells and other writings. It is a Books and Documents trapping, so it works with the inventory and trading.",
     "Types": {
       "spell": "Spells"
