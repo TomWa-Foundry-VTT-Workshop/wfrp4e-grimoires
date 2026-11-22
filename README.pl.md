@@ -40,13 +40,19 @@ Domyślnie (ustawienie klienta **Wygląd ksiąg**) księga wygląda jak iluminow
 
 ![Szkoły magii](docs/screenshots/illuminated-schools.png)
 
-![Zwój, karta czatu i strona zakazana](docs/screenshots/illuminated-scroll-chat.png)
+| | |
+|---|---|
+| ![Zwój i karta czatu](docs/screenshots/illuminated-scroll-chat.png) | ![Strona zakazana](docs/screenshots/illuminated-forbidden.png) |
 
 ## ✨ Zaklęcia z księgi na karcie
 
 Moduł trzyma się zasad WFRP 4e w takiej postaci, w jakiej obsługuje je system: zaklęcie na karcie, które **nie jest zapamiętane** (puste **M**), rzuca się z księgi, a pech losuje się z systemowej tabeli *Grimoire Miscast*.
 
 Gdy księga jest przy postaci, każde zaklęcie, które postać może z niej rzucić, pojawia się w zakładce **Magia** jako niezapamiętane, z ikoną księgi. Można je rzucać z karty, z Action HUD albo z okna księgi, a karty czatu działają jak zwykle. Kopie znikają, gdy księga opuści postać, przestanie być noszona albo straci zaklęcie. Wracają, gdy postać zapomni zapamiętane zaklęcie, które wciąż jest w księdze.
+
+| | |
+|---|---|
+| ![Zaklęcia z księgi na karcie](docs/screenshots/sheet-spells.png) | ![Działy Księgi i Zwoje](docs/screenshots/sheet-tomes.png) |
 
 ## 🎓 Zapamiętywanie
 
@@ -93,6 +99,10 @@ Moduł działa też w **Warhammer: The Old World** (system `whtow`). Okno księg
 * System nie ma talentu Czytanie/Pisanie, umiejętności Język, punktów wyposażenia ani testu Zepsucia przy lekturze, więc te warunki i ustawienia są wyłączone. Księgę nadal trzeba mieć przy sobie, a warunek **Tradycji** spełnia postać, która zna już zaklęcie tej szkoły (dla pierwszego zaklęcia ucznia MG może go wyłączyć).
 * Szyfr odczytuje się testem umiejętności wpisanej w księdze (domyślnie Przypominanie) i liczy sukcesy. Nieudany odpis jest wadliwy (WR +2), nigdy zniszczony.
 * Zwój przechowuje treść zaklęcia, ale system nie ma rzucania ze zwojów.
+
+![The Old World: księga i karta postaci](docs/screenshots/old-world-tome-and-sheet.png)
+
+![The Old World: Księgi i Zwoje w wyposażeniu](docs/screenshots/old-world-trappings.png)
 
 ## 📦 Wymagania
 

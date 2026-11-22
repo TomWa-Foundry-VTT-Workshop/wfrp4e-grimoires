@@ -40,13 +40,19 @@ By default (client setting **Tome look**) a tome looks like an illuminated spell
 
 ![Schools of magic](docs/screenshots/illuminated-schools.png)
 
-![Scroll, chat card and a forbidden page](docs/screenshots/illuminated-scroll-chat.png)
+| | |
+|---|---|
+| ![Scroll and chat card](docs/screenshots/illuminated-scroll-chat.png) | ![A forbidden page](docs/screenshots/illuminated-forbidden.png) |
 
 ## ✨ Spells from the grimoire on the sheet
 
 This follows the WFRP 4e rules as the system implements them: a spell on the sheet that is **not memorised** (empty **M**) is cast from a grimoire, and a miscast rolls on the system's *Grimoire Miscast* table.
 
 While a grimoire is carried, every spell the character can cast from it appears in the **Magic** tab as a non-memorised spell with a book icon. Cast it from the sheet, the Action HUD or the grimoire window, and chat cards work as usual. These copies disappear when the grimoire leaves the character, is no longer carried or loses the spell. They come back if the character forgets a memorised spell that the grimoire still holds.
+
+| | |
+|---|---|
+| ![Spells from the grimoire on the sheet](docs/screenshots/sheet-spells.png) | ![Tomes and Scrolls sections](docs/screenshots/sheet-tomes.png) |
 
 ## 🎓 Memorising
 
@@ -93,6 +99,10 @@ The module also works in **Warhammer: The Old World** (system `whtow`). The tome
 * The system has no Read/Write talent, Language skill, equip points or Corruption test for reading, so those requirements and settings are off. A book still needs to be carried, and the **Lore** requirement is met by a character who already knows a spell of that Lore (the GM can switch it off for an apprentice's first spell).
 * Ciphers use a test of the skill named on the book (Recall by default) and count successes. A failed copy is flawed (CV +2), never ruined.
 * Scrolls keep the text of a spell, but the system has no casting from scrolls.
+
+![The Old World: tome and character sheet](docs/screenshots/old-world-tome-and-sheet.png)
+
+![The Old World: Tomes and Scrolls under Trappings](docs/screenshots/old-world-trappings.png)
 
 ## 📦 Requirements
 
