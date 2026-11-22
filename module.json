@@ -65,11 +65,11 @@
       ]
     }
   },
-  "url": "https://github.com/TomasWarchol/wfrp4e-grimoires",
-  "manifest": "https://github.com/TomasWarchol/wfrp4e-grimoires/releases/latest/download/module.json",
-  "download": "https://github.com/TomasWarchol/wfrp4e-grimoires/releases/download/v0.7.0/module.zip",
-  "bugs": "https://github.com/TomasWarchol/wfrp4e-grimoires/issues",
-  "readme": "https://github.com/TomasWarchol/wfrp4e-grimoires/blob/main/README.md",
-  "changelog": "https://github.com/TomasWarchol/wfrp4e-grimoires/blob/main/CHANGELOG.md",
-  "license": "https://github.com/TomasWarchol/wfrp4e-grimoires/blob/main/LICENSE"
+  "url": "https://github.com/TomWa-Foundry-VTT-Workshop/wfrp4e-grimoires",
+  "manifest": "https://github.com/TomWa-Foundry-VTT-Workshop/wfrp4e-grimoires/releases/latest/download/module.json",
+  "download": "https://github.com/TomWa-Foundry-VTT-Workshop/wfrp4e-grimoires/releases/download/v0.7.0/module.zip",
+  "bugs": "https://github.com/TomWa-Foundry-VTT-Workshop/wfrp4e-grimoires/issues",
+  "readme": "https://github.com/TomWa-Foundry-VTT-Workshop/wfrp4e-grimoires/blob/main/README.md",
+  "changelog": "https://github.com/TomWa-Foundry-VTT-Workshop/wfrp4e-grimoires/blob/main/CHANGELOG.md",
+  "license": "https://github.com/TomWa-Foundry-VTT-Workshop/wfrp4e-grimoires/blob/main/LICENSE"
 }
