@@ -2,7 +2,7 @@
   "id": "wfrp4e-grimoires",
   "title": "WFRP4e – Grimoires",
   "description": "Spellbooks for WFRP4e 10.x and Warhammer: The Old World: a separate inventory section and an open-book window listing the spells by Lore, with full spell details, casting from the book (WFRP) and learning spells with GM approval.",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "compatibility": {
     "minimum": "14",
     "verified": "14",
@@ -67,7 +67,7 @@
   },
   "url": "https://github.com/TomWa-Foundry-VTT-Workshop/wfrp4e-grimoires",
   "manifest": "https://github.com/TomWa-Foundry-VTT-Workshop/wfrp4e-grimoires/releases/latest/download/module.json",
-  "download": "https://github.com/TomWa-Foundry-VTT-Workshop/wfrp4e-grimoires/releases/download/v0.7.0/module.zip",
+  "download": "https://github.com/TomWa-Foundry-VTT-Workshop/wfrp4e-grimoires/releases/download/v0.9.1/module.zip",
   "bugs": "https://github.com/TomWa-Foundry-VTT-Workshop/wfrp4e-grimoires/issues",
   "readme": "https://github.com/TomWa-Foundry-VTT-Workshop/wfrp4e-grimoires/blob/main/README.md",
   "changelog": "https://github.com/TomWa-Foundry-VTT-Workshop/wfrp4e-grimoires/blob/main/CHANGELOG.md",

@@ -10,6 +10,9 @@ import { t } from "./constants.mjs";
 import { bookKindOf, isGrimoire, readBook } from "./grimoire-data.mjs";
 import { getBookKind, isHeldKind } from "./book-kinds.mjs";
 
+/** Czy księgę można założyć, również gdy jej ustawienia nie wymagają wolnych rąk. */
+export const isEquippableGrimoire = (item) => isGrimoire(item) && isHeldKind(bookKindOf(item));
+
 /** Ręce zajmowane przez trzymaną księgę (0 dla innych przedmiotów). */
 export function bookHands(item) {
   return isGrimoire(item) ? readBook(item).hands : 0;
@@ -50,7 +53,7 @@ export function registerHands() {
   Hooks.on("preUpdateItem", (item, changes, _options, userId) => {
     if (!foundry.utils.getProperty(changes, "system.equipped.value") || !isGrimoire(item)) return;
     const kind = bookKindOf(item);
-    if (isHeldKind(kind)) return;
+    if (isEquippableGrimoire(item)) return;
     if (userId === game.user.id) {
       ui.notifications.info(t("Hands.NotHeld", { name: item.name, kind: game.i18n.localize(getBookKind(kind)?.labelKey ?? "") }));
     }

@@ -16,7 +16,7 @@ import { getEntryType, registerEntryType } from "./entry-types.mjs";
 import { spellType } from "./spell-type.mjs";
 import { addAliases } from "./names.mjs";
 import { iconMarkup, registerUiHelpers, useIlluminated } from "./ui.mjs";
-import { registerHands } from "./hands.mjs";
+import { isEquippableGrimoire, registerHands } from "./hands.mjs";
 
 registerEntryType(spellType);
 
@@ -50,6 +50,7 @@ Hooks.once("init", () => {
     make: (item) => makeGrimoire(item),
     isBook,
     isGrimoire,
+    isEquippableGrimoire,
     /** { form, language, cover, requirements, entries: [{ id, type, sourceUuid, data }] } */
     read: readBook,
     /** Dokłada nowy typ wpisów ksiąg (patrz scripts/entry-types.mjs). */

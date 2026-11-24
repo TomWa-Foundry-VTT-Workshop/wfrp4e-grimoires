@@ -1,6 +1,6 @@
 {
   "WFRP4E_GRIMOIRE": {
-    "Title": "Tomes",
+    "Title": "Magic Grimoire",
     "NewGrimoire": "New Tome",
     "WrittenIn": "Script: {language}",
     "Search": "Search the pages",
@@ -9,7 +9,7 @@
     "Illegible": "The writing means nothing to you.",
     "CNShort": "CN",
     "Inventory": {
-      "Section": "Tomes",
+      "Section": "Magic Grimoire",
       "Carried": "Carried",
       "Open": "Open the tome",
       "CopyTooltip": "From a grimoire – disappears when the grimoire leaves the character. Memorise it to keep it.",

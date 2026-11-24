@@ -8,7 +8,7 @@ Księgi i zwoje dla **WFRP4e 10.x** i **Warhammer: The Old World**: osobne dzia�
 
 * Księga to zwykły przedmiot systemu (*Książki i dokumenty*) oznaczony przez moduł. Ma wagę, cenę, dostępność, kontenery i handel, działa z Item Piles. Bez modułu zostaje zwykłą książką.
 * **Księgi** mają własny dział w ekwipunku z przełącznikiem **Przy sobie**. Ikona książki w wierszu (albo obrazek przedmiotu) otwiera księgę, a **+** tworzy nową.
-* Nową księgę tworzysz w oknie **Utwórz przedmiot**, wybierając typ **Księga Zaklęć**.
+* Nową księgę tworzysz w oknie **Utwórz przedmiot**, wybierając typ **Magiczny Grymuar**.
 * Każdą książkę można zamienić w księgę: **Uczyń księgą** w nagłówku arkusza przedmiotu.
 
 ## 🪄 Okno księgi

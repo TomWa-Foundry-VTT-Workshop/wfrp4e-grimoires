@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.2
+- Names: the tome type, window title and inventory section are now **Magic Grimoire** (Polish: **Magiczny Grymuar**).
+- New in the public API: `isEquippableGrimoire(item)` says whether a book can be equipped (taken in hand). The TomWa Warhammer HUD uses it to show grimoires among the equipment and in the hands widget.
+
 ## 0.9.1
 - The Create Item type is now called **Magic Grimoire** (Polish: **Księga Zaklęć**).
 - New English screenshots in the README with placeholder spell text, plus views of the character sheet and The Old World.
