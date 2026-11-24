@@ -4,10 +4,22 @@
 
 Księgi i zwoje dla **WFRP4e 10.x** i **Warhammer: The Old World**: osobne działy w ekwipunku i okno otwartej księgi ze spisem treści, pełnymi szczegółami wpisu, rzucaniem z księgi i zapamiętywaniem zaklęć za zgodą MG. Księga może zawierać nie tylko zaklęcia: inne moduły dokładają własne rodzaje wpisów, na przykład receptury z *Alchemii Starego Świata*.
 
+## 🚀 Na start: jak zrobić Magiczny Grymuar
+
+Moduł nie dodaje gotowych ksiąg. Przedmiot robisz sam, wybierając odpowiedni typ przedmiotu:
+
+1. Otwórz **Utwórz przedmiot**: w zakładce **Przedmioty** na pasku bocznym albo na karcie postaci.
+2. Wpisz nazwę i wybierz typ **Magiczny Grymuar** (jest na liście razem z typami przedmiotów systemu).
+3. Otwórz nowy grymuar (**Otwórz księgę** w nagłówku arkusza przedmiotu albo ikona książki w ekwipunku postaci) i przełącz go w tryb edycji przyciskiem ✒.
+4. Przeciągnij zaklęcia na strony z kompendium, zakładki Przedmioty albo karty postaci.
+5. Daj grymuar postaci i zaznacz **Przy sobie** (w The Old World: załóż go), żeby mogła z niego rzucać.
+
+Na karcie postaci **+** w dziale ekwipunku **Magiczny Grymuar** od razu tworzy nowy grymuar.
+
 ## 📖 Jak to działa
 
 * Księga to zwykły przedmiot systemu (*Książki i dokumenty*) oznaczony przez moduł. Ma wagę, cenę, dostępność, kontenery i handel, działa z Item Piles. Bez modułu zostaje zwykłą książką.
-* **Księgi** mają własny dział w ekwipunku z przełącznikiem **Przy sobie**. Ikona książki w wierszu (albo obrazek przedmiotu) otwiera księgę, a **+** tworzy nową.
+* Grymuary mają własny dział w ekwipunku **Magiczny Grymuar** z przełącznikiem **Przy sobie**. Ikona książki w wierszu (albo obrazek przedmiotu) otwiera księgę, a **+** tworzy nową.
 * Nową księgę tworzysz w oknie **Utwórz przedmiot**, wybierając typ **Magiczny Grymuar**.
 * Każdą książkę można zamienić w księgę: **Uczyń księgą** w nagłówku arkusza przedmiotu.
 

@@ -4,10 +4,22 @@
 
 Tomes and scrolls for **WFRP4e 10.x** and **Warhammer: The Old World**: their own inventory sections and an open-book window with a table of contents, full details of each entry, casting from the book and memorising spells with GM approval. A tome can hold more than spells: other modules add their own kinds of entries, such as the recipes of *Old World Alchemy*.
 
+## 🚀 Getting started: make a Magic Grimoire
+
+The module ships no ready-made books. You make the item yourself by choosing the right item type:
+
+1. Open **Create Item**: in the **Items** sidebar tab, or on a character sheet.
+2. Enter a name and choose the type **Magic Grimoire** (listed with the system's item types).
+3. Open the new grimoire (**Open tome** in the item sheet header, or the book icon in the character's inventory) and switch to edit mode with the ✒ button.
+4. Drag spells onto the pages from a compendium, the Items tab or a character sheet.
+5. Give the grimoire to a character and tick **Carried** (in The Old World: equip it) so they can cast from it.
+
+On a character sheet the **+** in the **Magic Grimoire** inventory section also creates a new grimoire straight away.
+
 ## 📖 How it works
 
 * A tome is an ordinary system item (a *Books and Documents* trapping) marked by the module. It keeps its weight, price, availability, containers and trading, and works with Item Piles. Without the module it is just a book.
-* **Tomes** get their own inventory section with a **Carried** toggle. The book icon in the row (or the item picture) opens the tome, and **+** creates a new one.
+* Grimoires get their own **Magic Grimoire** inventory section with a **Carried** toggle. The book icon in the row (or the item picture) opens the tome, and **+** creates a new one.
 * Create a new one in the **Create Item** window by choosing the **Magic Grimoire** type.
 * Any book can become a tome: **Make into tome** in the item sheet header.
 
